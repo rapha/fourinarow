@@ -1,8 +1,7 @@
 open List
 open Util
 
-type player = A | B | C
-let player_a, player_b = A, B
+type player = A | B
 
 type board = Board of player option list list
 let row_length, col_length = 7, 6
@@ -13,7 +12,7 @@ let columns board = match board with Board cols -> cols
 let rows board = columns board |> transpose
   
 let string_of_board board = 
-  let string_of_player player = match player with Some A -> "A" | Some B -> "B" | Some C -> "C" | None -> "-" in
+  let string_of_player player = match player with Some A -> "A" | Some B -> "B" | None -> "-" in
   let string_of_row row = map string_of_player row |> fold_left (^) "" in
   rows board |> rev |> map string_of_row |> fold_left (fun sofar line -> sofar ^ line ^ "\n") ""
 
