@@ -1,9 +1,9 @@
-type player = A | B
+open Player
 
 type board
 
 val empty_board : board
 
-val drop : board -> player -> int -> board
+val drop : player -> int -> board -> board
 
-val wins : board -> player -> bool 
+val wins : player -> board -> bool 

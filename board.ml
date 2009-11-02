@@ -1,7 +1,7 @@
 open List
 open Util
 
-type player = A | B
+open Player
 
 type board = Board of player option list list
 let row_length, col_length = 7, 6
@@ -12,8 +12,8 @@ let columns board = match board with Board cols -> cols
 let rows board = columns board |> transpose
   
 let string_of_board board = 
-  let string_of_player player = match player with Some A -> "A" | Some B -> "B" | None -> "-" in
-  let string_of_row row = map string_of_player row |> fold_left (^) "" in
+  let string_of_cell = function Some p -> string_of_player p | None -> "-" in
+  let string_of_row row = map string_of_cell row |> fold_left (^) "" in
   rows board |> rev |> map string_of_row |> fold_left (fun sofar line -> sofar ^ line ^ "\n") ""
 
 let tilt_left matrix = matrix |> map (fun row -> row @ list_of (col_length-1) None) |> mapi rotate_right
@@ -29,7 +29,7 @@ let diagonals tilt board =
 let north_east = diagonals tilt_left
 let north_west = diagonals tilt_right
 
-let drop board player col = 
+let drop player col board = 
   let cols = columns board in
   let column = nth cols (col-1) in
   if (length column >= col_length) then failwith "column full" else ();
@@ -50,7 +50,7 @@ let has_four_in_a_row player lines =
     in rest_contains_sublist sub_list full_list
   in lines |> exists (contains_sublist four_in_a_row)
 
-let wins board player = 
+let wins player board = 
   [columns; rows; north_east; north_west] 
     |> map ((|>) board)
     |> exists (has_four_in_a_row player)
