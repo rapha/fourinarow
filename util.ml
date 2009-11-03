@@ -13,11 +13,11 @@ let (|->) start finish =
 
 let list_of count value = Array.make count value |> Array.to_list
 
-let transpose matrix =
+let transpose len matrix =
   let cross_section vectors i = map (fun vector -> 
     try nth vector i with Failure "nth" -> None
   ) vectors
-  in map (cross_section matrix) (0 |-> (length matrix))
+  in map (cross_section matrix) (0 |-> len)
 
 let sublist xs start finish = 
   let finish = min finish (length xs) in

@@ -62,6 +62,15 @@ let _ =
         ) empty_board 4
         |> wins A |> assert_equal true
       );
+      "string_of_board for empty board is 6 row by 7 cols of -" >:: (fun() ->
+        empty_board |> string_of_board |> assert_equal (
+          "-------\n" ^
+          "-------\n" ^
+          "-------\n" ^
+          "-------\n" ^
+          "-------\n" ^
+          "-------\n" )
+      );
   ]) |> ignore;
   
   run_test_tt ("game" >::: [

@@ -9,7 +9,7 @@ let row_length, col_length = 7, 6
 let empty_board = Board (list_of row_length [])
 
 let columns board = match board with Board cols -> cols
-let rows board = columns board |> transpose
+let rows board = columns board |> transpose col_length
   
 let string_of_board board = 
   let string_of_cell = function Some p -> string_of_player p | None -> "-" in
@@ -23,7 +23,7 @@ let diagonals tilt board =
   rows board |> 
   rev |> 
   tilt |>
-  transpose |> 
+  transpose (col_length + row_length) |>
   map (filter is_some)
 
 let north_east = diagonals tilt_left
