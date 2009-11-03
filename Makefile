@@ -1,13 +1,13 @@
 SOURCES=util.mli util.ml player.ml board.mli board.ml game.mli game.ml
 OBJECTS=util.cmo player.cmo board.cmo game.cmo
 
-all: run_tests tbui
+all: run_tests tbui gui
 
 run_tests: tests
 	./run_tests
 
-run_tbui: tbui
-	./tbui
+gui: $(OBJECTS) gui.cmo
+	ocamlfind ocamlc -o gui -g -linkpkg $(OBJECTS) -package labltk gui.cmo
 
 tbui: $(OBJECTS) tbui.cmo
 	ocamlfind ocamlc -o tbui -g -linkpkg $(OBJECTS) tbui.cmo
@@ -24,5 +24,8 @@ test.cmo: $(OBJECTS) test.ml
 tbui.cmo: tbui.ml
 	ocamlc -c -g tbui.ml
 
+gui.cmo: gui.ml
+	ocamlfind ocamlc -c -g -package labltk gui.ml
+
 clean:
-	rm *.cmi *.cmo run_tests tbui
+	rm *.cmi *.cmo run_tests tbui gui
