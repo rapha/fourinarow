@@ -74,7 +74,7 @@ let _ =
     "play_turn calls drop handler" >:: (fun() ->
       let game = new_game in
       let called = ref false in
-      let handler = function Drop _ -> called := true | _ -> () in
+      let handler = function Drop 3 -> called := true | _ -> () in
       let game = handle handler game in
       game |> play_turn move |> ignore;
       assert_equal !called true
@@ -82,7 +82,7 @@ let _ =
     "play_turn calls switch player handler" >:: (fun() ->
       let game = new_game in
       let called = ref false in
-      let handler = function Switch _ -> called := true | _ -> () in
+      let handler = function Switch (B,A) -> called := true | _ -> () in
       let game = handle handler game in
       game |> play_turn move |> ignore;
       assert_equal !called true

@@ -1,9 +1,15 @@
-all: run_tests
+all: run_tests tbui
 
-run_tests: build_tests
+run_tests: tests
 	./run_tests
 
-build_tests: test.cmo
+run_tbui: tbui
+	./tbui
+
+tbui: tbui.cmo
+	ocamlfind ocamlc -o tbui -g -linkpkg util.cmo player.cmo board.cmo game.cmo tbui.cmo
+
+tests: test.cmo
 	ocamlfind ocamlc -o run_tests -g -linkpkg -package oUnit util.cmo player.cmo board.cmo game.cmo test.cmo
 
 util.cmo:
@@ -24,5 +30,8 @@ game.cmo: player.cmo board.cmo
 test.cmo: util.cmo board.cmo game.cmo
 	ocamlfind ocamlc -c -g -package oUnit test.ml
 
+tbui.cmo: game.cmo
+	ocamlc -c -g tbui.ml
+
 clean:
-	rm *.cmi *.cmo run_tests
+	rm *.cmi *.cmo run_tests tbui

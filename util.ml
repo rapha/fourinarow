@@ -1,6 +1,8 @@
 open List
 
 let (|>) x f = f x
+let (>>) f g x = g (f x)
+
 let is_some = function Some _ -> true | None -> false
 
 let (|->) start finish =
