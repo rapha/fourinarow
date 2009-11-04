@@ -1,6 +1,6 @@
 open Player
 
-type event = Drop of int | Switch of (player * player)
+type event = Drop of (int * int * player) | Switch of player
 
 type game
 

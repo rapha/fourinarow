@@ -55,3 +55,5 @@ let wins player board =
     |> map ((|>) board)
     |> exists (has_four_in_a_row player)
 
+let top col board =
+  nth (columns board) (col-1) |> filter is_some |> length
