@@ -82,19 +82,31 @@ let _ =
     );
     "play_turn calls drop handler" >:: (fun() ->
       let game = new_game in
-      let called = ref false in
-      let handler = function Drop (1,3,A) -> called := true | _ -> () in
+      let handled = ref false in
+      let handler = function Drop (1,3,A) -> handled := true | _ -> () in
       let game = handle handler game in
       game |> play_turn move |> ignore;
-      assert_equal !called true
+      assert_equal !handled true
     );
     "play_turn calls switch player handler" >:: (fun() ->
       let game = new_game in
-      let called = ref false in
-      let handler = function Switch B -> called := true | _ -> () in
+      let handled = ref false in
+      let handler = function Switch B -> handled := true | _ -> () in
       let game = handle handler game in
       game |> play_turn move |> ignore;
-      assert_equal !called true
+      assert_equal !handled true
+    );
+    "play_turn calls win handler" >:: (fun() ->
+      let first _ = 1 and second _ = 2 in
+      let game = new_game |> 
+        play_turn first |> play_turn second |> 
+        play_turn first |> play_turn second |> 
+        play_turn first |> play_turn second in
+      let handled = ref false in
+      let handler = function Win A -> handled := true | _ -> () in
+      let game = handle handler game in
+      game |> play_turn first |> ignore;
+      assert_equal !handled true
     );
     "play_turn toggles current player" >:: (fun() ->
       let game = new_game in

@@ -2,7 +2,7 @@ open Player
 open Board
 open Util
 
-type event = Drop of (int * int * player) | Switch of player
+type event = Drop of (int * int * player) | Switch of player | Win of player
 
 type game = Game of (player * player) * board * (event -> unit) list
 
@@ -13,8 +13,11 @@ let play_turn move game =
     let col = (move game) in
     let board = drop a col board in
     let row = top col board in
-    List.iter (fun handler -> handler (Drop (row,col,a))) handlers;
-    List.iter (fun handler -> handler (Switch b)) handlers;
+    let fire event =
+      List.iter ((|>) event) handlers in
+    fire (Drop (row,col,a));
+    fire (Switch b);
+    if wins a board then fire (Win a);
     (Game ((b,a), board, handlers)) 
 
 let handle handler game =
@@ -22,7 +25,3 @@ let handle handler game =
 
 let string_of_game game =
   match game with | Game (_, board, _) -> string_of_board board
-
-let winner game =
-  match game with | Game ((a,b), board, _) -> 
-    if wins a board then Some a else if wins b board then Some b else None

@@ -4,30 +4,32 @@ open Game
 open Player
 open Util
 
-let game = ref new_game
+let _ =
+  let widget = openTk () in
 
-let on_drop container = function
-  | Drop (row, col, player) ->
-    let lable = string_of_player player in
-    grid ~row:(7-row) ~column:(col-1) [Button.create ~text:lable container]
-  | _ -> ()
+  let on_drop = function
+    | Drop (row, col, player) -> 
+        let label = (string_of_player player) in
+        grid ~row:(7-row) ~column:(col-1) [Button.create ~text:label widget]
+    | _ -> () 
 
-let drop col _ = 
-  game := play_turn (fun _ -> col) !game;
-  match winner !game with 
-    | Some player -> player |> string_of_player |> Printf.printf "%s wins\n"; closeTk ()
-    | None -> ()
+  and on_win = function
+    | Win player -> 
+        let message = (string_of_player player) ^ " wins" in 
+        Dialog.create ~parent:widget ~title:"Game Over" ~message:message ~buttons:["OK"] () |> ignore;
+        closeTk ()
+    | _ -> () in
 
-let setup () =
-  let top = openTk () in
+  let game = new_game |> handle on_drop |> handle on_win |> ref in
+
+  let drop col _ = (game := play_turn (fun _ -> col) !game; ()) in
+
   foldi (fun _ row ->
     foldi (fun _ col -> 
       let button = 
-        if row = 0 then Button.create ~text:"v" ~command:(drop (col+1)) top else Button.create ~text:"-" top 
+        if row = 0 then Button.create ~text:"v" ~command:(drop (col+1)) widget else Button.create ~text:"-" widget 
       in grid ~column:col ~row:row [button]
     ) () 7
   ) () 7;
-  game := handle (on_drop top) !game;
-  ()
 
-let _ = setup () ; Printexc.print mainLoop ()
+  Printexc.print mainLoop ()
