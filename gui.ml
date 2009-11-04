@@ -9,8 +9,8 @@ let _ =
 
   let on_drop = function
     | Drop (row, col, player) -> 
-        let label = (string_of_player player) in
-        grid ~row:(7-row) ~column:(col-1) [Button.create ~text:label widget]
+        let colour = match player with A -> `Yellow | B -> `Red in
+        grid ~row:(7-row) ~column:(col-1) [Label.create ~text:"    " ~background:colour widget]
     | _ -> () 
 
   and on_win = function
@@ -24,12 +24,11 @@ let _ =
 
   let drop col _ = (game := play_turn (fun _ -> col) !game; ()) in
 
+  foldi (fun _ col -> grid ~column:col ~row:0 [Button.create ~text:"v" ~command:(drop (col+1)) widget]) () 7;
   foldi (fun _ row ->
     foldi (fun _ col -> 
-      let button = 
-        if row = 0 then Button.create ~text:"v" ~command:(drop (col+1)) widget else Button.create ~text:"-" widget 
-      in grid ~column:col ~row:row [button]
+      grid ~column:col ~row:(row+1) [Label.create ~text:"." ~borderwidth:4 widget]
     ) () 7
-  ) () 7;
+  ) () 6;
 
   Printexc.print mainLoop ()
