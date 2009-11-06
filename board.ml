@@ -8,23 +8,30 @@ let row_length, col_length = 7, 6
 
 let empty_board = Board (list_of row_length [])
 
-let columns board = match board with Board cols -> cols
-let rows board = columns board |> transpose col_length
+let columns = function Board cols -> cols
+let rows = columns >> transpose col_length
   
-let string_of_board board = 
+let string_of_board = 
   let string_of_cell = function Some p -> string_of_player p | None -> "-" in
-  let string_of_row row = map string_of_cell row |> fold_left (^) "" in
-  rows board |> rev |> map string_of_row |> fold_left (fun sofar line -> sofar ^ line ^ "\n") ""
+  let string_of_row = map string_of_cell >> fold_left (^) "" in
+  rows >> rev >> map string_of_row >> fold_left (fun sofar line -> sofar ^ line ^ "\n") ""
 
-let tilt_left matrix = matrix |> map (fun row -> row @ list_of (col_length-1) None) |> mapi rotate_right
-let tilt_right matrix = matrix |> map (fun row -> list_of (col_length-1) None @ row) |> mapi rotate_left
+let trim predicate =
+  let rec trim_head = function
+    | [] -> []
+    | head::tail as list -> if predicate head then list else trim_head tail
+  in
+  trim_head >> rev >> trim_head >> rev
 
-let diagonals tilt board = 
-  rows board |> 
-  rev |> 
-  tilt |>
-  transpose (col_length + row_length) |>
-  map (filter is_some)
+let tilt_left = map (fun row -> row @ list_of (col_length-1) None) >> mapi rotate_right
+let tilt_right = map (fun row -> list_of (col_length-1) None @ row) >> mapi rotate_left
+
+let diagonals tilt = 
+  rows >> 
+  rev >> 
+  tilt >> 
+  transpose (col_length + row_length) >> 
+  map (trim is_some)
 
 let north_east = diagonals tilt_left
 let north_west = diagonals tilt_right
@@ -38,7 +45,7 @@ let drop player col board =
       after  = (sublist cols col (length cols)) 
   in Board (before @ [new_column] @ after)
 
-let has_four_in_a_row player lines =
+let has_four_in_a_row player =
   let four_in_a_row = list_of 4 (Some player)
   and contains_sublist sub_list full_list =
     let rec rest_contains_sublist sub rest =
@@ -48,7 +55,7 @@ let has_four_in_a_row player lines =
         | (x::sub_tail, y::rest_tail) when x = y -> rest_contains_sublist sub_tail rest_tail
         | (_, y::rest_tail) -> rest_contains_sublist sub_list rest_tail
     in rest_contains_sublist sub_list full_list
-  in lines |> exists (contains_sublist four_in_a_row)
+  in exists (contains_sublist four_in_a_row)
 
 let wins player board = 
   [columns; rows; north_east; north_west] 

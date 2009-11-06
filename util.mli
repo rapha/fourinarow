@@ -1,3 +1,4 @@
+val (|->) : int -> int -> int list
 val (|>) : 'a -> ('a -> 'b) -> 'b
 val (>>) : ('a -> 'b) -> ('b -> 'c) -> 'a -> 'c
 val foldi : ('a -> int -> 'a) -> 'a -> int -> 'a

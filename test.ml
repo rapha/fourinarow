@@ -62,6 +62,22 @@ let _ =
         ) empty_board 4
         |> wins A |> assert_equal true
       );
+      "false for NW line of 3" >:: (fun() ->
+        foldi (fun g i ->
+          let col = 4 - i in
+          foldi (drop_in col B) g i |> drop A (col+1)
+        ) empty_board 4
+        |> wins A |> assert_equal true
+      ); 
+      "false when there is a gap in the line" >:: (fun() ->
+        empty_board |> 
+        drop B 1 |>
+        (* gap *)
+        drop A 3 |> drop A 3 |> drop B 3 |>
+        drop A 4 |> drop A 4 |> drop A 4 |> drop B 4 |> 
+        drop A 5 |> drop A 5 |> drop A 5 |> drop B 5 |> drop B 5 |> 
+        wins B |> assert_equal false
+      );
       "string_of_board for empty board is 6 row by 7 cols of -" >:: (fun() ->
         empty_board |> string_of_board |> assert_equal (
           "-------\n" ^
