@@ -29,3 +29,5 @@ let rotate_right vector i = rev (rotate_left (rev vector) i)
 
 let foldi func seed count = fold_left func seed (0 |-> count)
 let mapi func vector = map2 func vector (0 |-> (length vector))
+
+let tap f x = (f x); x

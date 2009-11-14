@@ -9,3 +9,4 @@ val transpose : int -> 'a option list list -> 'a option list list
 val sublist : 'a list -> int -> int -> 'a list
 val rotate_left : 'a list -> int -> 'a list
 val rotate_right : 'a list -> int -> 'a list
+val tap : ('a -> 'b) -> 'a -> 'a
