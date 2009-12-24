@@ -1,13 +1,11 @@
-open Player
+type t 
 
-type board
+val empty : t
 
-val empty_board : board
+val drop : Player.t -> int -> t -> t
 
-val drop : player -> int -> board -> board
+val wins : Player.t -> t -> bool 
 
-val wins : player -> board -> bool 
+val to_string : t -> string
 
-val string_of_board : board -> string
-
-val top : int -> board -> int
+val top_row : int -> t -> int

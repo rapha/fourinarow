@@ -1,13 +1,11 @@
-open Player
+type event = Drop of (int * int * Player.t) | Switch of Player.t | Win of Player.t
 
-type event = Drop of (int * int * player) | Switch of player | Win of player
+type t 
 
-type game
+val create : Player.t -> Player.t -> t
 
-val new_game : game
+val play_turn : (t -> int) -> t -> t
 
-val play_turn : (game -> int) -> game -> game
+val handle : (event -> unit) -> t -> t
 
-val handle : (event -> unit) -> game -> game
-
-val string_of_game : game -> string
+val to_string : t -> string
