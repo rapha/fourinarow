@@ -15,7 +15,7 @@ let _ =
       let drop_command _ = 
         game := Game.play_turn (fun _ -> col + 1) !game in
       Button.create ~text:"v" ~command:drop_command widget in
-    List.map button (0 |-> 7) in
+    map button (0 -- 6) |> List.of_enum in
 
   let on_drop = function
     | Game.Drop (row, col, player) -> 
@@ -37,10 +37,11 @@ let _ =
   game := !game |> Game.handle on_drop |> Game.handle on_win |> Game.handle on_switch;
 
   grid ~row:0 button_row;
-  foldi (fun _ row ->
-    foldi (fun _ col -> 
-      grid ~column:col ~row:(row+1) [Label.create ~text:"." ~borderwidth:4 widget]
-    ) () 7
-  ) () 6;
+  for row = 1 to 6 do
+    for col = 0 to 6 do
+      grid ~column:col ~row:row [Label.create ~text:"." ~borderwidth:4 widget]
+    done
+  done
+  ;
 
   Printexc.print mainLoop ()

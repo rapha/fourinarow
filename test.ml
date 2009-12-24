@@ -49,20 +49,13 @@ let _ =
         ) Board.empty 3 
         |> Board.wins Player.A |> assert_equal false
       );
-      "false for NW line of 3" >:: (fun() ->
+      "false for NW line of 4" >:: (fun() ->
         foldi (fun g i ->
           let col = 4 - i in
           foldi (drop_in col Player.B) g i |> Board.drop Player.A (col+1)
         ) Board.empty 4
         |> Board.wins Player.A |> assert_equal true
       );
-      "false for NW line of 3" >:: (fun() ->
-        foldi (fun g i ->
-          let col = 4 - i in
-          foldi (drop_in col Player.B) g i |> Board.drop Player.A (col+1)
-        ) Board.empty 4
-        |> Board.wins Player.A |> assert_equal true
-      ); 
       "false when there is a gap in the line" >:: (fun() ->
         Board.empty |> 
         Board.drop Player.B 1 |>

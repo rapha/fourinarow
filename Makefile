@@ -7,25 +7,25 @@ run_tests: tests
 	./run_tests
 
 gui: $(OBJECTS) gui.cmo
-	ocamlfind ocamlc -o gui -g -linkpkg $(OBJECTS) -package labltk gui.cmo
+	ocamlfind batteries/ocamlc -o gui -g -linkpkg $(OBJECTS) -package labltk gui.cmo
 
 tbui: $(OBJECTS) tbui.cmo
-	ocamlfind ocamlc -o tbui -g -linkpkg $(OBJECTS) tbui.cmo
+	ocamlfind batteries/ocamlc -o tbui -g -linkpkg $(OBJECTS) tbui.cmo
 
 tests: $(OBJECTS) test.cmo
-	ocamlfind ocamlc -o run_tests -g -linkpkg -package oUnit $(OBJECTS) test.cmo
+	ocamlfind batteries/ocamlc -o run_tests -g -linkpkg -package oUnit $(OBJECTS) test.cmo
 
 $(OBJECTS) : $(SOURCES)
-	ocamlc -c -g $(SOURCES)
+	ocamlfind batteries/ocamlc -c -g $(SOURCES)
 
 test.cmo: $(OBJECTS) test.ml
-	ocamlfind ocamlc -c -g -package oUnit test.ml
+	ocamlfind batteries/ocamlc -c -g -package oUnit test.ml
 
 tbui.cmo: tbui.ml
-	ocamlc -c -g tbui.ml
+	ocamlfind batteries/ocamlc -c -g tbui.ml
 
 gui.cmo: gui.ml
-	ocamlfind ocamlc -c -g -package labltk gui.ml
+	ocamlfind batteries/ocamlc -c -g -package labltk gui.ml
 
 clean:
 	rm *.cmi *.cmo run_tests tbui gui
