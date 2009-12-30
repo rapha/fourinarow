@@ -1,20 +1,7 @@
 open OUnit
-open Util
 
 let _ =
   let move _ = 3 in
-
-  let make_board rows =
-    let str_to_player = function "A" -> Some Player.A | "B" -> Some Player.B | _ -> None
-    in rows
-      |> List.map (Str.split (Str.regexp "") |- List.map str_to_player)
-      |> transpose 7
-      |> List.map (List.filter ((=) None |- not) |- List.map Option.get)
-      |> List.fold_left2
-        (fun board i players -> players |> List.fold_left (fun b player -> b |> Board.drop player i) board)
-        Board.empty
-        (1 -- 7 |> List.of_enum)
-  in
 
   run_test_tt ("Player" >::: [
       "to_string A" >:: (fun() -> 
@@ -29,14 +16,14 @@ let _ =
         Board.empty |> Board.wins Player.A |> assert_equal false
       );
       "false for vertical line of 3" >:: (fun() -> 
-        make_board [
+        Board.build [
           "A------";
           "A------";
           "A------"]
           |> Board.wins Player.A |> assert_equal false
       );
       "true for vertical line of 4" >:: (fun() -> 
-        make_board [
+        Board.build [
           "A------";
           "A------";
           "A------";
@@ -44,24 +31,24 @@ let _ =
         |> Board.wins Player.A |> assert_equal true
       );
       "false for horizontal line of 3" >:: (fun() -> 
-        make_board [
+        Board.build [
           "AAA----"] 
         |> Board.wins Player.A |> assert_equal false
       );
       "true for horizontal line of 4" >:: (fun() -> 
-        make_board [
+        Board.build [
           "AAAA---"]
         |> Board.wins Player.A |> assert_equal true
       );
       "false for NE line of 3" >:: (fun() ->
-        make_board [
+        Board.build [
           "--A----";
           "-AB----";
           "ABB----"]
         |> Board.wins Player.A |> assert_equal false
       );
       "true for NE line of 4" >:: (fun() ->
-        make_board [
+        Board.build [
           "---A---";
           "--AB---";
           "-ABB---";
@@ -69,14 +56,14 @@ let _ =
         |> Board.wins Player.A |> assert_equal true
       );
       "false for NW line of 3" >:: (fun() ->
-        make_board [
+        Board.build [
           "A------";
           "BA-----";
           "BBA----"]
         |> Board.wins Player.A |> assert_equal false
       );
       "true for NW line of 4" >:: (fun() ->
-        make_board [
+        Board.build [
           "A------";
           "BA-----";
           "BBA----";
@@ -84,7 +71,7 @@ let _ =
         |> Board.wins Player.A |> assert_equal true
       );
       "false when there is a gap in the line" >:: (fun() ->
-        make_board [
+        Board.build [
           "----B--";
           "---BB--";
           "--BAA--";

@@ -1,7 +1,5 @@
 open Tk
 
-open Util
-
 let _ =
   let game = ref (Game.create Player.A Player.B) in
 

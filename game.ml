@@ -1,5 +1,3 @@
-open Util
-
 type event = Drop of (int * int * Player.t) | Switch of Player.t | Win of Player.t
 
 type t = Game of (Player.t * Player.t) * Board.t * (event -> unit) list
