@@ -6,8 +6,6 @@ let row_length, col_length = 7, 6
 let columns = function Board cols -> cols
 let rows = columns |- transpose col_length
 
-let list_of count value = Enum.repeat ~times:count value |> List.of_enum
-  
 let trim predicate =
   let rec trim_head = function
     | [] -> []
@@ -15,8 +13,8 @@ let trim predicate =
   in
   trim_head |- List.rev |- trim_head |- List.rev
 
-let tilt_left = List.map (fun row -> row @ list_of (col_length-1) None) |- List.mapi rotate_right
-let tilt_right = List.map (fun row -> list_of (col_length-1) None @ row) |- List.mapi rotate_left
+let tilt_left = List.map (fun row -> row @ List.make (col_length-1) None) |- List.mapi rotate_right
+let tilt_right = List.map (fun row -> List.make (col_length-1) None @ row) |- List.mapi rotate_left
 
 let diagonals tilt = 
   rows |- List.rev |- tilt |- transpose (col_length + row_length) |- List.map (trim Option.is_some)
@@ -25,7 +23,7 @@ let north_east = diagonals tilt_left
 let north_west = diagonals tilt_right
 
 let has_four_in_a_row player line = 
-  let four_in_a_row = list_of 4 (Some player) in
+  let four_in_a_row = List.make 4 (Some player) in
   let contains_sublist sub_list full_list =
     let rec rest_contains_sublist sub rest =
       match (sub, rest) with 
@@ -38,7 +36,7 @@ let has_four_in_a_row player line =
 
 (* API *)
 
-let empty = Board (list_of row_length [])
+let empty = Board (List.make row_length [])
 
 let drop player col board = 
   let cols = columns board in
