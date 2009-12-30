@@ -2,9 +2,19 @@ open OUnit
 open Util
 
 let _ =
-  let drop_in_each player board i = Board.drop player (i+1) board in
-  let drop_in i player board _ = Board.drop player (i+1) board in
   let move _ = 3 in
+
+  let make_board rows =
+    let str_to_player = function "A" -> Some Player.A | "B" -> Some Player.B | _ -> None
+    in rows
+      |> List.map (Str.split (Str.regexp "") |- List.map str_to_player)
+      |> transpose 7
+      |> List.map (List.filter ((=) None |- not) |- List.map Option.get)
+      |> List.fold_left2
+        (fun board i players -> players |> List.fold_left (fun b player -> b |> Board.drop player i) board)
+        Board.empty
+        (1 -- 7 |> List.of_enum)
+  in
 
   run_test_tt ("Player" >::: [
       "to_string A" >:: (fun() -> 
@@ -19,51 +29,68 @@ let _ =
         Board.empty |> Board.wins Player.A |> assert_equal false
       );
       "false for vertical line of 3" >:: (fun() -> 
-        foldi (drop_in 1 Player.A) Board.empty 3 |> Board.wins Player.A |> assert_equal false
+        make_board [
+          "A------";
+          "A------";
+          "A------"]
+          |> Board.wins Player.A |> assert_equal false
       );
       "true for vertical line of 4" >:: (fun() -> 
-        foldi (drop_in 1 Player.A) Board.empty 4 |> Board.wins Player.A |> assert_equal true
+        make_board [
+          "A------";
+          "A------";
+          "A------";
+          "A------"]
+        |> Board.wins Player.A |> assert_equal true
       );
       "false for horizontal line of 3" >:: (fun() -> 
-        foldi (drop_in_each Player.A) Board.empty 3 |> Board.wins Player.A |> assert_equal false
-      );
-      "true for horizontal line of 4" >:: (fun() -> 
-        foldi (drop_in_each Player.A) Board.empty 4 |> Board.wins Player.A |> assert_equal true
-      );
-      "false for NE line of 3" >:: (fun() ->
-        foldi (fun g i ->
-          foldi (drop_in i Player.B) g i |> Board.drop Player.A (i+1)
-        ) Board.empty 3 
+        make_board [
+          "AAA----"] 
         |> Board.wins Player.A |> assert_equal false
       );
-      "false for NE line of 4" >:: (fun() ->
-        foldi (fun g i ->
-          foldi (drop_in i Player.B) g i |> Board.drop Player.A (i+1)
-        ) Board.empty 4
+      "true for horizontal line of 4" >:: (fun() -> 
+        make_board [
+          "AAAA---"]
+        |> Board.wins Player.A |> assert_equal true
+      );
+      "false for NE line of 3" >:: (fun() ->
+        make_board [
+          "--A----";
+          "-AB----";
+          "ABB----"]
+        |> Board.wins Player.A |> assert_equal false
+      );
+      "true for NE line of 4" >:: (fun() ->
+        make_board [
+          "---A---";
+          "--AB---";
+          "-ABB---";
+          "ABBB---"]
         |> Board.wins Player.A |> assert_equal true
       );
       "false for NW line of 3" >:: (fun() ->
-        foldi (fun g i ->
-          let col = 3 - i in
-          foldi (drop_in col Player.B) g i |> Board.drop Player.A (col+1)
-        ) Board.empty 3 
+        make_board [
+          "A------";
+          "BA-----";
+          "BBA----"]
         |> Board.wins Player.A |> assert_equal false
       );
-      "false for NW line of 4" >:: (fun() ->
-        foldi (fun g i ->
-          let col = 4 - i in
-          foldi (drop_in col Player.B) g i |> Board.drop Player.A (col+1)
-        ) Board.empty 4
+      "true for NW line of 4" >:: (fun() ->
+        make_board [
+          "A------";
+          "BA-----";
+          "BBA----";
+          "BBBA---"]
         |> Board.wins Player.A |> assert_equal true
       );
       "false when there is a gap in the line" >:: (fun() ->
-        Board.empty |> 
-        Board.drop Player.B 1 |>
-        (* gap *)
-        Board.drop Player.A 3 |> Board.drop Player.A 3 |> Board.drop Player.B 3 |>
-        Board.drop Player.A 4 |> Board.drop Player.A 4 |> Board.drop Player.A 4 |> Board.drop Player.B 4 |> 
-        Board.drop Player.A 5 |> Board.drop Player.A 5 |> Board.drop Player.A 5 |> Board.drop Player.B 5 |> Board.drop Player.B 5 |> 
-        Board.wins Player.B |> assert_equal false
+        make_board [
+          "----B--";
+          "---BB--";
+          "--BAA--";
+          "--AAA--";
+          "B-AAA--"]
+        |> Board.wins Player.B |> assert_equal false
       );
       "string_of_board for empty board is 6 row by 7 cols of -" >:: (fun() ->
         Board.empty |> Board.to_string |> assert_equal (
