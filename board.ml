@@ -16,6 +16,7 @@ let trim predicate =
   in
   trim_head |- List.rev |- trim_head |- List.rev
 
+
 type t = Board of Player.t option list list
 let row_length, col_length = 7, 6
 
@@ -33,15 +34,15 @@ let north_west = diagonals tilt_right
 
 let has_four_in_a_row player line = 
   let four_in_a_row = List.make 4 (Some player) in
-  let contains_sublist sub_list full_list =
-    let rec rest_contains_sublist sub rest =
+  let contains sub_list full_list =
+    let rec rest_contains sub rest =
       match (sub, rest) with 
         | ([], _) -> true
         | (_, []) -> false
-        | (x::sub_tail, y::rest_tail) when x = y -> rest_contains_sublist sub_tail rest_tail
-        | (_, y::rest_tail) -> rest_contains_sublist sub_list rest_tail
-    in rest_contains_sublist sub_list full_list
-  in List.exists (contains_sublist four_in_a_row) line
+        | (x::sub_tail, y::rest_tail) when x = y -> rest_contains sub_tail rest_tail
+        | (_, y::rest_tail) -> rest_contains sub_list rest_tail
+    in rest_contains sub_list full_list
+  in List.exists (contains four_in_a_row) line
 
 (* API *)
 
@@ -71,9 +72,9 @@ let build rows =
   let str_to_player = function "A" -> Some Player.A | "B" -> Some Player.B | _ -> None
   in rows
     |> List.map (Str.split (Str.regexp "") |- List.map str_to_player)
-    |> transpose 7
+    |> transpose row_length
     |> List.map (List.filter ((=) None |- not) |- List.map Option.get)
     |> List.fold_left2
       (fun board i players -> players |> List.fold_left (fun b player -> b |> drop player i) board)
       empty
-      (1 -- 7 |> List.of_enum)
+      (1 -- row_length |> List.of_enum)
