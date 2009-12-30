@@ -5,6 +5,8 @@ let row_length, col_length = 7, 6
 
 let columns = function Board cols -> cols
 let rows = columns |- transpose col_length
+
+let list_of count value = Enum.repeat ~times:count value |> List.of_enum
   
 let trim predicate =
   let rec trim_head = function
@@ -13,8 +15,8 @@ let trim predicate =
   in
   trim_head |- List.rev |- trim_head |- List.rev
 
-let tilt_left = List.map (fun row -> row @ list_of (col_length-1) None) |- mapi rotate_right
-let tilt_right = List.map (fun row -> list_of (col_length-1) None @ row) |- mapi rotate_left
+let tilt_left = List.map (fun row -> row @ list_of (col_length-1) None) |- List.mapi rotate_right
+let tilt_right = List.map (fun row -> list_of (col_length-1) None @ row) |- List.mapi rotate_left
 
 let diagonals tilt = 
   rows |- List.rev |- tilt |- transpose (col_length + row_length) |- List.map (trim Option.is_some)
