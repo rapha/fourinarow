@@ -79,7 +79,7 @@ let _ =
           "B-AAA--"]
         |> Board.wins Player.B |> assert_equal false
       );
-      "string_of_board for empty board is 6 row by 7 cols of -" >:: (fun() ->
+      "Board.to_string for empty board is 6 row by 7 cols of -" >:: (fun() ->
         Board.empty |> Board.to_string |> assert_equal (
           "-------\n" ^
           "-------\n" ^
