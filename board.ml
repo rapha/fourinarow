@@ -78,7 +78,7 @@ let build rows =
   in rows |> List.enum 
     |> map (Str.split (Str.regexp "") |- List.enum |- map str_to_player)
     |> transpose col_length
-    |> map (filter ((=) None |- not) |- map Option.get)
+    |> map (filter (not -| (=) None) |- map Option.get)
     |> Enum.foldi
       (fun i players board -> players |> fold (fun b player -> b |> drop player (i+1)) board)
       empty
