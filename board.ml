@@ -4,15 +4,13 @@ type t = Board of Player.t option list list
 
 let rev enum = enum |> List.of_enum |> List.rev |> List.enum
 
-let nth n = Enum.skip n |- Enum.peek 
+let nth n = Enum.skip n |- Enum.peek
 
 let transpose len matrix =
-  let nth n = Enum.skip n |- Enum.peek |- Option.default None in
-  let cross_section n = matrix |> Enum.clone |> map (nth n) in
+  let cross_section n = matrix |> Enum.clone |> map (nth n |- Option.default None) in
   map cross_section (0 -- (len-1))
 
 let rotate_left i vector = 
-  let vector = Enum.clone vector in
   Enum.append (Enum.skip i vector) (Enum.take i vector)
 
 let rotate_right i = 
@@ -35,7 +33,7 @@ let contains sub_list full_list =
 
 let row_length, col_length = 7, 6
 
-let columns = function Board cols -> cols |> List.enum |> map List.enum
+let columns (Board cols) = cols |> List.enum |> map List.enum
 let rows = columns |- transpose col_length
 
 let tilt_left = map (flip (Enum.append) (Enum.repeat ~times:(col_length-1) None)) |- Enum.mapi rotate_right
