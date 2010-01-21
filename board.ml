@@ -36,14 +36,15 @@ let row_length, col_length = 7, 6
 let columns (Board cols) = cols
 let rows = columns |- List.transpose col_length
 
-let tilt_left = List.map (flip (@) (List.make (col_length-1) None)) |- List.mapi List.rotate_right
-let tilt_right = List.map ((@) (List.make (col_length-1) None)) |- List.mapi List.rotate_left
+let tilt_left, tilt_right =
+  let padding = (List.make (col_length-1) None) in
+  let tilter pad rotate = List.map pad |- List.mapi rotate in
+  (tilter (flip (@) padding) List.rotate_right, tilter ((@) padding) List.rotate_left)
 
-let diagonals tilt board =
-  board |> rows |> List.rev |> tilt |> List.transpose (col_length + row_length) |> List.map (List.trim ((=) None))
+let diagonals tilt =
+  rows |- List.rev |- tilt |- List.transpose (col_length + row_length) |- List.map (List.trim ((=) None))
 
-let north_east = diagonals tilt_left
-let north_west = diagonals tilt_right
+let north_east, north_west = (diagonals tilt_left, diagonals tilt_right)
 
 (* public *)
 
