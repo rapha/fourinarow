@@ -1,23 +1,28 @@
 type event = Drop of (int * int * Player.t) | Switch of Player.t | Win of Player.t
 
-type t = Game of (Player.t * Player.t) * Board.t * (event -> unit) list
+type t = { current_player : Player.t; other_player : Player.t; board : Board.t; event_handlers : (event -> unit) list }
 
-let create player_1 player_2 = Game ((player_1, player_2), Board.empty, [])
+let create player_1 player_2 = { 
+  current_player = player_1; 
+  other_player = player_2; 
+  board = Board.empty; 
+  event_handlers = [] 
+}
 
-let play_turn move game =
-  match game with | Game ((a,b), board, handlers) ->
+let play_turn move game = match game with
+  | { current_player = a; other_player = b; board = board; event_handlers = handlers } ->
     let col = (move game) in
-    let board = Board.drop a col board in
-    let row = Board.top_row col board in
+    let new_board = Board.drop a col board in
+    let row = Board.top_row col new_board in
     let fire event =
       List.iter ((|>) event) handlers in
     fire (Drop (row,col,a));
     fire (Switch b);
-    if Board.wins a board then fire (Win a);
-    (Game ((b,a), board, handlers)) 
+    if Board.wins a new_board then fire (Win a);
+    { game with current_player = b; other_player = a; board = new_board }
 
-let handle handler = function 
-  | (Game ((a,b), board, handlers)) -> Game ((a,b), board, handler::handlers)
+let handle handler game = match game with
+  | { event_handlers = handlers } -> { game with event_handlers = handler::handlers }
 
 let to_string = function
-  | (Game (_, board, _)) -> Board.to_string board
+  | { board = board } -> Board.to_string board
