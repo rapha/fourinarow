@@ -71,7 +71,7 @@ let top_row col board =
 let to_string =
   let cell_to_string = function Some p -> Player.to_string p | None -> "-" in
   let row_to_string = List.map cell_to_string |- List.reduce (^) |- flip (^) "\n" in
-  rows |- List.map row_to_string |- List.reduce (^)
+  rows |- List.rev |- List.map row_to_string |- List.reduce (^)
 
 let build rows =
   let str_to_player = function "A" -> Some Player.A | "B" -> Some Player.B | _ -> None
