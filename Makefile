@@ -1,4 +1,4 @@
-SOURCES=player.ml board.mli board.ml game.mli game.ml
+SOURCES=player.ml board.ml game.ml
 OBJECTS=player.cmo board.cmo game.cmo
 
 all: run_tests tbui gui

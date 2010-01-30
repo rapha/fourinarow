@@ -1,3 +1,5 @@
+module TestGame = Game.Normal
+
 open OUnit
 
 let _ =
@@ -93,43 +95,49 @@ let _ =
   run_test_tt ("game" >::: [
     "uses argument passed in to get row to drop in" >:: (fun() ->
       let col = ref None in
-      let move c _ = (col := Some c; c) in
-      Game.create Player.A Player.B |> Game.play_turn (move 3) |> ignore;
+      let module TestGame = Game.Make (struct include Board 
+        let drop _ c board =
+          col := Some c;
+          board
+      end) in
+
+      TestGame.create Player.A Player.B |> TestGame.play_turn (fun _ -> 3) |> ignore;
+
       assert_equal !col (Some 3)
     );
     "play_turn calls drop handler" >:: (fun() ->
-      let game = Game.create Player.A Player.B in
+      let game = TestGame.create Player.A Player.B in
       let handled = ref false in
-      let handler = function Game.Drop (1,3,Player.A) -> handled := true | _ -> () in
-      let game = Game.handle handler game in
-      game |> Game.play_turn move |> ignore;
+      let handler = function TestGame.Drop (1,3,Player.A) -> handled := true | _ -> () in
+      let game = TestGame.handle handler game in
+      game |> TestGame.play_turn move |> ignore;
       assert_equal !handled true
     );
     "play_turn calls switch player handler" >:: (fun() ->
-      let game = Game.create Player.A Player.B in
+      let game = TestGame.create Player.A Player.B in
       let handled = ref false in
-      let handler = function Game.Switch Player.B -> handled := true | _ -> () in
-      let game = Game.handle handler game in
-      game |> Game.play_turn move |> ignore;
+      let handler = function TestGame.Switch Player.B -> handled := true | _ -> () in
+      let game = TestGame.handle handler game in
+      game |> TestGame.play_turn move |> ignore;
       assert_equal !handled true
     );
     "play_turn calls win handler" >:: (fun() ->
       let first _ = 1 and second _ = 2 in
-      let game = Game.create Player.A Player.B |> 
-        Game.play_turn first |> Game.play_turn second |> 
-        Game.play_turn first |> Game.play_turn second |> 
-        Game.play_turn first |> Game.play_turn second in
+      let game = TestGame.create Player.A Player.B |> 
+        TestGame.play_turn first |> TestGame.play_turn second |> 
+        TestGame.play_turn first |> TestGame.play_turn second |> 
+        TestGame.play_turn first |> TestGame.play_turn second in
       let win_handled = ref false in
-      let handler = function Game.Win Player.A -> win_handled := true | _ -> () in
-      let game = Game.handle handler game in
-      game |> Game.play_turn first |> ignore;
+      let handler = function TestGame.Win Player.A -> win_handled := true | _ -> () in
+      let game = TestGame.handle handler game in
+      game |> TestGame.play_turn first |> ignore;
       assert_equal !win_handled true
     );
     "play_turn toggles current player" >:: (fun() ->
-      let game = Game.create Player.A Player.B in
+      let game = TestGame.create Player.A Player.B in
       let players = ref [] in
-      let handler = function Game.Switch a -> players := (a :: !players) | _ -> () in
-      game |> Game.handle handler |> Game.play_turn move |> Game.play_turn move |> Game.play_turn move |> ignore;
+      let handler = function TestGame.Switch a -> players := (a :: !players) | _ -> () in
+      game |> TestGame.handle handler |> TestGame.play_turn move |> TestGame.play_turn move |> TestGame.play_turn move |> ignore;
       assert_equal !players [Player.B;Player.A;Player.B];
     );
   ]) 

@@ -1,6 +1,6 @@
 type t = Board of Player.t option list list
 
-(* list util functions *)
+(* locally add some handy functions to the List module *)
 
 module List_ = struct
   include List
