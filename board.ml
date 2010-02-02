@@ -85,3 +85,5 @@ let build rows =
         players |> List.fold_left (add_player (i+1)) board
       )
       empty
+      
+let evaluate _ _ = 0.

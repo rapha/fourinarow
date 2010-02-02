@@ -6,6 +6,7 @@ module Make (Board : sig
   val top_row : int -> t -> int
   val to_string : t -> string
 end) = struct
+
   type event = Drop of (int * int * Player.t) | Switch of Player.t | Win of Player.t
 
   type t = { current_player : Player.t; other_player : Player.t; board : Board.t; event_handlers : (event -> unit) list }
@@ -34,6 +35,12 @@ end) = struct
 
   let to_string = function
     | { board = board } -> Board.to_string board
+
+  let board = function
+    | { board = board } -> board
+
+  let players = function
+    | { current_player = current; other_player = other } -> (current, other)
 end
 
 module Normal = Make (Board)
