@@ -7,16 +7,24 @@ end) = struct
 
   let rec minimax depth mover (player, opponent) board =
     let best, worst = if player <> mover then (max, min) else (min, max) in
+    let fail = best infinity neg_infinity in
     if board |> Board.wins opponent then
-      best infinity neg_infinity |> Enum.repeat ~times:7
+       fail |> Enum.repeat ~times:7
     else
-      let scores =
-        if depth <= 0 then
-          map (Board.evaluate player)
-        else
-          map (minimax (depth-1) mover (opponent,player)) |- map (reduce best)
-      in
-      (1 -- 7) |> map (fun column -> Board.drop player column board) |> scores
+      (1 -- 7)
+      |> map (fun column ->
+        try
+          let score =
+            if depth <= 0 then
+              Board.evaluate player
+            else
+              minimax (depth-1) mover (opponent,player) |- reduce best
+          in
+          Board.drop player column board |> score
+        with
+          Failure "column full" -> fail
+        )
+
 
   let choose_move depth mover game =
     game

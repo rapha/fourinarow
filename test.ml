@@ -182,7 +182,7 @@ let _ =
         TestAI.minimax 0 Player.A (Player.A, Player.B) Board.empty |> List.of_enum |>
         assert_equal [5.; 8.; -6.; 1.; 0.; 0.; 0.]
         );
-      "minimax with depth 1 returns lowest eval values from next level" >:: (fun() ->
+      "minimax with depth 1 returns lowest eval values from level" >:: (fun() ->
         let module TestAI = Ai.Make (struct include Board
           let evaluate player board =
             match board |> to_string |> Str.split (Str.regexp "\n") |> List.last with
@@ -200,6 +200,19 @@ let _ =
 
         TestAI.minimax 1 Player.A (Player.A, Player.B) Board.empty |> List.of_enum |>
         assert_equal [-2.; -3.; -10.; -4.; 0.; 0.; 0.];
+        );
+      "minimax returns an -Inf value for a full column" >:: (fun() ->
+        let module TestAI = Ai.Make (Board) in
+
+        TestAI.minimax 1 Player.A (Player.A, Player.B) (Board.build [
+              "B------";
+              "A------";
+              "B------";
+              "A------";
+              "B------";
+              "A------";
+            ]) |> List.of_enum |>
+        assert_equal [neg_infinity; 0.; 0.; 0.; 0.; 0.; 0.];
         );
       "choose_move will return the move with the highest score" >:: (fun() ->
         let module TestAI = Ai.Make (struct include Board
