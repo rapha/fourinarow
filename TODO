@@ -1,0 +1,10 @@
+- introduce alpha-beta pruning to minimax algorithm. 
+  - need to fold over the columns rather than straight map?
+- change the evaluation so that forced winning after fewer steps is worth more than forced winning after more steps (other player might not move optimally)
+- If AI thinks all cols lead to failure, will currently choose the last one. If this is full there's a problem, and it will eventually fill up in this case
+  - if it does choose a full column, it means that it thinks it can't win. Maybe need to make full columns have a worse score than a losing move. 
+  - need to deal with the situation where all columns are full. This means a draw.
+- clean up the messy use of modules
+  - move choose_column function into the player module?
+- for better game-play, randomise the choice from equal-valued moves
+  - but ensure tests are deterministic

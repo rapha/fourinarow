@@ -214,7 +214,7 @@ let _ =
             ]) |> List.of_enum |>
         assert_equal [neg_infinity; 0.; 0.; 0.; 0.; 0.; 0.];
         );
-      "choose_move will return the move with the highest score" >:: (fun() ->
+      "choose_column will return the move with the highest score" >:: (fun() ->
         let module TestAI = Ai.Make (struct include Board
           let evaluate player board =
             match board |> to_string |> Str.split (Str.regexp "\n") |> List.last with
@@ -222,7 +222,7 @@ let _ =
             | _         -> 0.
         end) in
 
-        TestAI.choose_move 0 Player.A (TestGame.create Player.A Player.B) |>
+        TestAI.choose_column 0 Player.A (TestGame.create Player.A Player.B) |>
         assert_equal 4
         );
   ]) |> ignore;
