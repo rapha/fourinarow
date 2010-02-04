@@ -222,7 +222,7 @@ let _ =
             | _         -> 0.
         end) in
 
-        TestAI.choose_column 0 Player.A (TestGame.create Player.A Player.B) |>
+        TestAI.choose_column 0 (TestGame.create Player.A Player.B) |>
         assert_equal 4
         );
   ]) |> ignore;

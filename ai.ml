@@ -24,14 +24,15 @@ end) = struct
           Failure "column full" -> fail
         )
 
-  let choose_column depth mover game =
+  let choose_column depth game =
+    let (mover, opponent) as players = game |> Game.Normal.players in
     let max_index =
       Enum.foldi (fun index value (maxi,max) -> if value >= max then (index,value) else (maxi,max)) (-1, neg_infinity)
       |- fst
     in
     game
     |> Game.Normal.board
-    |> minimax depth mover (Game.Normal.players game)
+    |> minimax depth mover players
     |> max_index
     |> (+) 1
 end
