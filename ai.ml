@@ -25,12 +25,13 @@ end) = struct
         )
 
   let choose_column depth mover game =
+    let max_index =
+      Enum.foldi (fun index value (maxi,max) -> if value >= max then (index,value) else (maxi,max)) (-1, neg_infinity)
+      |- fst
+    in
     game
     |> Game.Normal.board
     |> minimax depth mover (Game.Normal.players game)
-    |> Enum.foldi (fun index value (maxi,max) ->
-        if value >= max then (index,value) else (maxi,max)
-        ) (-1, neg_infinity)
-    |> fst
+    |> max_index
     |> (+) 1
 end
