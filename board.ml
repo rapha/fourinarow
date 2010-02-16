@@ -53,7 +53,7 @@ let empty = Board (List.make row_length [])
 let drop player col board =
   let cols = columns board in
   let column = List.nth cols (col-1) in
-  if (List.length column >= col_length) then failwith "column full" else ();
+  if (List.length column >= col_length) then failwith "column full" else
   let new_column = column @ [Some player] and
       before = (List.take (col-1) cols) and
       after  = (List.drop col cols)
@@ -74,16 +74,8 @@ let to_string =
   rows |- List.rev |- List.map row_to_string |- List.reduce (^)
 
 let build rows =
-  let str_to_player = function "A" -> Some Player.A | "B" -> Some Player.B | _ -> None
-  in rows
-    |> List.map (Str.split (Str.regexp "") |- List.map str_to_player)
-    |> List.transpose col_length
-    |> List.map (List.filter (not -| (=) None) |- List.map Option.get)
-    |> List.enum |> Enum.foldi
-      (fun i players board ->
-        let add_player col board player = drop player col board in
-        players |> List.fold_left (add_player (i+1)) board
-      )
-      empty
-      
+  let str_to_player = function "A" -> Some Player.A | "B" -> Some Player.B | _ -> None in
+  let cols = rows |> List.map (Str.split (Str.regexp "") |- List.map str_to_player) |> List.transpose row_length in
+  Board cols
+
 let evaluate _ _ = 0.

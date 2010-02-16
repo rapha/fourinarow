@@ -6,33 +6,34 @@ module Make (Board : sig
 end) = struct
 
   let rec minimax depth mover (player, opponent) board =
-    let worst = if player = mover then min else max in
+    let best, worst = if player = mover then (max,min) else (min,max) in
     let fail = worst infinity neg_infinity in
-    if board |> Board.wins opponent then
-       fail |> Enum.repeat ~times:7
+    if Board.wins opponent board then
+      fail
     else
-      let score =
-        if depth <= 0 then
-          Board.evaluate player
-        else
-          minimax (depth-1) mover (opponent,player) |- reduce worst
-      in
-      (1 -- 7) |> map (fun column ->
-        try
-          Board.drop player column board |> score
-        with
-          Failure "column full" -> fail
-        )
+      if depth <= 0 then
+        Board.evaluate player board
+      else
+        (1 -- 7)
+        |> map (fun column ->
+          try
+            Board.drop player column board |> minimax (depth-1) mover (opponent,player)
+          with
+            Failure "column full" -> fail
+          )
+        |> reduce best
 
   let choose_column depth game =
-    let (mover, opponent) as players = game |> Game.Normal.players in
+    let (mover, opponent) = game |> Game.Normal.players in
     let max_index =
-      Enum.foldi (fun index value (maxi,max) -> if value >= max then (index,value) else (maxi,max)) (-1, neg_infinity)
+      Enum.foldi (fun index value (maxi,max) ->
+        if value >= max then (index,value) else (maxi,max)) (-1, neg_infinity)
       |- fst
     in
-    game
-    |> Game.Normal.board
-    |> minimax depth mover players
+    let board = game |> Game.Normal.board in
+    (1 -- 7)
+    |> map (fun column -> Board.drop mover column board)
+    |> map (minimax depth mover (opponent, mover))
     |> max_index
     |> (+) 1
 end

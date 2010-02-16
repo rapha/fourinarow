@@ -143,76 +143,71 @@ let _ =
   ]) |> ignore;
 
   run_test_tt ("AI" >::: [
-      "minimax returns all 0 if empty" >:: (fun() ->
+      "minimax returns 0 if empty" >:: (fun() ->
         let module TestAI = Ai.Make(Board) in
-        Board.empty |> TestAI.minimax 0 Player.A (Player.A,Player.B) |> List.of_enum |>
-        assert_equal (List.make 7 0.)
+        Board.empty |> TestAI.minimax 0 Player.A (Player.A,Player.B) |>
+        assert_equal 0.
       );
-      "minimax returns all -Inf if opponent has won" >:: (fun() ->
+      "minimax returns -Inf if opponent has won" >:: (fun() ->
         let module TestAI = Ai.Make (struct include Board
           let wins player board =
             player = Player.B
         end) in
-        TestAI.minimax 0 Player.A (Player.A,Player.B) Board.empty |> List.of_enum |>
-        assert_equal (List.make 7 neg_infinity)
+        TestAI.minimax 0 Player.A (Player.A,Player.B) Board.empty |>
+        assert_equal ~printer:string_of_float neg_infinity
       );
       "minimax with depth 1 returns Inf if column makes player win" >:: (fun() ->
         let module TestAI = Ai.Make (struct include Board
-          let last_drop = ref None
-          let drop _ column board =
-            last_drop := Some column;
-            board
           let wins player board =
-            !last_drop = Some 5
+            match board |> to_string |> Str.split (Str.regexp "\n") |> List.last with
+            | "----A--" -> true
+            | _         -> false
         end) in
-        TestAI.minimax 1 Player.A (Player.A, Player.B) Board.empty |> List.of_enum |>
-        assert_equal [0.; 0.; 0.; 0.; infinity; 0.; 0.]
+        TestAI.minimax 1 Player.A (Player.A, Player.B) Board.empty |>
+        assert_equal ~printer:string_of_float infinity
         );
-      "minimax with depth 0 returns values from eval function" >:: (fun() ->
+      "minimax with depth 0 returns value from eval function" >:: (fun() ->
         let module TestAI = Ai.Make (struct include Board
-          let evaluate player board =
-            match (1 -- 7) |> map (flip top_row board) |> List.of_enum with
-            | [1; 0; 0; 0; 0; 0; 0] ->  5.
-            | [0; 1; 0; 0; 0; 0; 0] ->  8.
-            | [0; 0; 1; 0; 0; 0; 0] -> -6.
-            | [0; 0; 0; 1; 0; 0; 0] ->  1.
-            | _                     ->  0.
+          let evaluate _ _ = 5.
         end) in
 
-        TestAI.minimax 0 Player.A (Player.A, Player.B) Board.empty |> List.of_enum |>
-        assert_equal [5.; 8.; -6.; 1.; 0.; 0.; 0.]
+        TestAI.minimax 0 Player.A (Player.A, Player.B) Board.empty |>
+        assert_equal 5.
         );
-      "minimax with depth 1 returns lowest eval values from level" >:: (fun() ->
+      "minimax with depth 0 returns highest values from eval function after 1 turn" >:: (fun() ->
         let module TestAI = Ai.Make (struct include Board
           let evaluate player board =
             match board |> to_string |> Str.split (Str.regexp "\n") |> List.last with
-            | "AB-----" ->  -2.
-            | "A-B----" ->  -1.
-            | "A--B---" ->   1.
-            | "BA-----" ->   4.
-            | "-AB----" ->  -3.
-            | "B-A----" -> -10.
-            | "B--A---" ->  -4.
-            | "-B-A---" ->  -1.
-            | "--BA---" ->   3.
-            | _         ->   0.
+            | "-A-----" ->  5.
+            | _         ->  0.
         end) in
 
-        TestAI.minimax 1 Player.A (Player.A, Player.B) Board.empty |> List.of_enum |>
-        assert_equal [-2.; -3.; -10.; -4.; 0.; 0.; 0.];
+        TestAI.minimax 1 Player.A (Player.A, Player.B) Board.empty |>
+        assert_equal 5.
+        );
+      "minimax with depth 1 returns highest of lowest eval values after 2 turns" >:: (fun() ->
+        let module TestAI = Ai.Make (struct include Board
+          let evaluate player board =
+            let bottom_row = board |> to_string |> Str.split (Str.regexp "\n") |> List.last in
+            let col_with_A = Str.search_forward (Str.regexp "A") bottom_row 0 |> (+) 1 in
+            col_with_A |> float_of_int |> ( *. ) (-1.)
+        end) in
+
+        TestAI.minimax 1 Player.A (Player.A, Player.B) Board.empty |>
+        assert_equal (-1.)
         );
       "minimax returns an -Inf value for a full column" >:: (fun() ->
         let module TestAI = Ai.Make (Board) in
 
         TestAI.minimax 1 Player.A (Player.A, Player.B) (Board.build [
-              "B------";
-              "A------";
-              "B------";
-              "A------";
-              "B------";
-              "A------";
-            ]) |> List.of_enum |>
-        assert_equal [neg_infinity; 0.; 0.; 0.; 0.; 0.; 0.];
+              "BABBBAB";
+              "ABAAABA";
+              "BABBBAB";
+              "ABAAABA";
+              "BABBBAB";
+              "ABAAABA";
+            ]) |>
+        assert_equal neg_infinity
         );
       "choose_column will return the move with the highest score" >:: (fun() ->
         let module TestAI = Ai.Make (struct include Board
