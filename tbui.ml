@@ -1,9 +1,11 @@
 open Game.Normal
+open Printf
 module AI = Ai.Make(Board)
 
 let winner = ref None
 
-let read_column _ =
+let prompt_column _ =
+  printf "column: "; flush stdout;
   input_line stdin |> int_of_string
 
 let on_win = function
@@ -11,21 +13,22 @@ let on_win = function
   | _ -> ()
 
 let print game =
-  game |> to_string |> Printf.printf "%s\n"; flush stdout; game
+  game |> to_string |> printf "%s\n"; flush stdout;
+  game
 
 let rec loop game =
   match !winner with
-  | Some p -> p |> Player.to_string |> Printf.printf "%s wins\n"
+  | Some p -> p |> Player.to_string |> printf "%s wins\n"
   | None ->
-      let get_column =
+      let choose_column =
         let player = game |> players |> fst in
         if player = Player.A then
-          read_column
+          prompt_column
         else
           AI.choose_column 4
       in
       let play move = play_turn move game in
-      get_column |> play |> print |> loop
+      choose_column |> play |> print |> loop
 
-;;
-create Player.A Player.B |> handle on_win |> loop
+let _ =
+  create Player.A Player.B |> handle on_win |> loop
