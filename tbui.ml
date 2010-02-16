@@ -25,7 +25,7 @@ let rec loop game =
         if player = Player.A then
           prompt_column
         else
-          AI.choose_column 4
+          AI.choose_column 6
       in
       let play move = play_turn move game in
       choose_column |> play |> print |> loop
