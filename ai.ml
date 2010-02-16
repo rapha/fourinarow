@@ -5,7 +5,7 @@ module Make (Board : sig
   val evaluate : Player.t -> t -> float
 end) = struct
 
-  let rec minimax depth mover (player, opponent) board =
+  let rec minimax depth mover (player, opponent) limit board =
     let best, worst = if player = mover then (max,min) else (min,max) in
     let fail = worst infinity neg_infinity in
     if Board.wins opponent board then
@@ -16,12 +16,17 @@ end) = struct
       else
         let rec best_child_score champion = function
           | [] -> champion
-          | col::rest ->
+          | column :: rest ->
               let contender =
-                try Board.drop player col board |> minimax (depth-1) mover (opponent,player)
+                try board |> Board.drop player column |> minimax (depth-1) mover (opponent,player) champion
                 with Failure "column full" -> fail
-              in best_child_score (best champion contender) rest
-        in best_child_score fail (List.init 7 ((+) 1))
+              in
+              if (best contender limit) = contender then
+                contender
+              else
+                best_child_score (best champion contender) rest
+        in
+        best_child_score fail (1 -- 7 |> List.of_enum)
 
   let choose_column depth game =
     let (mover, opponent) = game |> Game.Normal.players in
@@ -33,7 +38,7 @@ end) = struct
     let board = game |> Game.Normal.board in
     (1 -- 7)
     |> map (fun column -> Board.drop mover column board)
-    |> map (minimax depth mover (opponent, mover))
+    |> map (minimax depth mover (opponent, mover) neg_infinity)
     |> max_index
     |> (+) 1
 end
