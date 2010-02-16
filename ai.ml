@@ -5,9 +5,11 @@ module Make (Board : sig
   val evaluate : Player.t -> t -> float
 end) = struct
 
+  let win, lose = 100., (-100.)
+
   let rec minimax depth mover (player, opponent) limit board =
     let best, worst = if player = mover then (max,min) else (min,max) in
-    let fail = worst infinity neg_infinity in
+    let fail = worst win lose in
     if Board.wins opponent board then
       fail
     else
@@ -32,13 +34,13 @@ end) = struct
     let (mover, opponent) = game |> Game.Normal.players in
     let max_index =
       Enum.foldi (fun index value (maxi,max) ->
-        if value >= max then (index,value) else (maxi,max)) (-1, neg_infinity)
+        if value >= max then (index,value) else (maxi,max)) (-1, lose)
       |- fst
     in
     let board = game |> Game.Normal.board in
     (1 -- 7)
     |> map (fun column -> Board.drop mover column board)
-    |> map (minimax depth mover (opponent, mover) neg_infinity)
+    |> map (minimax depth mover (opponent, mover) lose)
     |> max_index
     |> (+) 1
 end
