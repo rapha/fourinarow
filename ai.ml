@@ -11,7 +11,7 @@ end) = struct
     let best, worst = if player = mover then (max,min) else (min,max) in
     let fail = worst win lose in
     if Board.wins opponent board then
-      fail
+      fail /. (depth + 1 |> float_of_int) (* winning sooner is worse than winning later *)
     else
       if depth <= 0 then
         Board.evaluate player board
