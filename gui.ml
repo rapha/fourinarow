@@ -16,6 +16,13 @@ let _ =
       Button.create ~text:"v" ~command:drop_command widget in
     map button (0 -- 6) |> List.of_enum in
 
+  grid ~row:0 button_row;
+  for row = 1 to 6 do
+    for col = 0 to 6 do
+      grid ~column:col ~row:row [Label.create ~text:"." ~borderwidth:4 widget]
+    done
+  done;
+
   let on_drop = function
     | Drop (row, col, player) -> 
         let piece = Label.create ~text:"    " ~background:(colour player) widget in
@@ -34,13 +41,5 @@ let _ =
     | _ -> () in
 
   game := !game |> handle on_drop |> handle on_win |> handle on_switch;
-
-  grid ~row:0 button_row;
-  for row = 1 to 6 do
-    for col = 0 to 6 do
-      grid ~column:col ~row:row [Label.create ~text:"." ~borderwidth:4 widget]
-    done
-  done
-  ;
 
   Printexc.print mainLoop ()
