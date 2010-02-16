@@ -1,31 +1,31 @@
 SOURCES=player.ml board.ml game.ml ai.ml
-OBJECTS=player.cmo board.cmo game.cmo ai.cmo
+OBJECTS=player.cmx board.cmx game.cmx ai.cmx
 
 all: run_tests tbui gui
 
 run_tests: tests
 	./run_tests
 
-gui: $(OBJECTS) gui.cmo
-	ocamlfind batteries/ocamlc -o gui -g -linkpkg $(OBJECTS) -package labltk gui.cmo
+gui: $(OBJECTS) gui.cmx
+	ocamlfind batteries/ocamlopt -o gui -g -linkpkg $(OBJECTS) -package labltk gui.cmx
 
-tbui: $(OBJECTS) tbui.cmo
-	ocamlfind batteries/ocamlc -o tbui -g -linkpkg $(OBJECTS) tbui.cmo
+tbui: $(OBJECTS) tbui.cmx
+	ocamlfind batteries/ocamlopt -o tbui -g -linkpkg $(OBJECTS) tbui.cmx
 
-tests: $(OBJECTS) test.cmo
-	ocamlfind batteries/ocamlc -o run_tests -g -linkpkg -package oUnit $(OBJECTS) test.cmo
+tests: $(OBJECTS) test.cmx
+	ocamlfind batteries/ocamlopt -o run_tests -g -linkpkg -package oUnit $(OBJECTS) test.cmx
 
 $(OBJECTS) : $(SOURCES)
-	ocamlfind batteries/ocamlc -c -g $(SOURCES)
+	ocamlfind batteries/ocamlopt -c -g $(SOURCES)
 
-test.cmo: $(OBJECTS) test.ml
-	ocamlfind batteries/ocamlc -c -g -package oUnit test.ml
+test.cmx: $(OBJECTS) test.ml
+	ocamlfind batteries/ocamlopt -c -g -package oUnit test.ml
 
-tbui.cmo: tbui.ml
-	ocamlfind batteries/ocamlc -c -g tbui.ml
+tbui.cmx: tbui.ml
+	ocamlfind batteries/ocamlopt -c -g tbui.ml
 
-gui.cmo: gui.ml
-	ocamlfind batteries/ocamlc -c -g -package labltk gui.ml
+gui.cmx: gui.ml
+	ocamlfind batteries/ocamlopt -c -g -package labltk gui.ml
 
 clean:
-	rm *.cmi *.cmo run_tests tbui gui
+	rm *.cmi *.cmo *.cmx *.o run_tests tbui gui
