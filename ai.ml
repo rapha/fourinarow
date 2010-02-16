@@ -14,14 +14,14 @@ end) = struct
       if depth <= 0 then
         Board.evaluate player board
       else
-        (1 -- 7)
-        |> map (fun column ->
-          try
-            Board.drop player column board |> minimax (depth-1) mover (opponent,player)
-          with
-            Failure "column full" -> fail
-          )
-        |> reduce best
+        let rec best_child_score champion = function
+          | [] -> champion
+          | col::rest ->
+              let contender =
+                try Board.drop player col board |> minimax (depth-1) mover (opponent,player)
+                with Failure "column full" -> fail
+              in best_child_score (best champion contender) rest
+        in best_child_score fail (List.init 7 ((+) 1))
 
   let choose_column depth game =
     let (mover, opponent) = game |> Game.Normal.players in
