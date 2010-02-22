@@ -52,11 +52,11 @@ let empty = Board (List.make row_length [])
 
 let drop player col board =
   let cols = columns board in
-  let column = List.nth cols (col-1) in
+  let column = List.nth cols col in
   if (List.length column >= col_length) then failwith "column full" else
   let new_column = column @ [Some player] and
-      before = (List.take (col-1) cols) and
-      after  = (List.drop col cols)
+      before = (List.take col cols) and
+      after  = (List.drop (col+1) cols)
   in Board (before @ [new_column] @ after)
 
 let wins player board =
@@ -66,7 +66,7 @@ let wins player board =
   |> List.exists (List.exists (List.contains four_in_a_row))
 
 let top_row col board =
-  List.nth (columns board) (col-1) |> List.filter Option.is_some |> List.length
+  List.nth (columns board) col |> List.filter Option.is_some |> List.length
 
 let to_string =
   let cell_to_string = function Some p -> Player.to_string p | None -> "-" in

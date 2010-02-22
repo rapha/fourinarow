@@ -28,7 +28,7 @@ end) = struct
               else
                 best_child_score (best champion contender) rest
         in
-        best_child_score fail (1 -- 7 |> List.of_enum)
+        best_child_score fail (0 -- 6 |> List.of_enum)
 
   let choose_column depth game =
     let (mover, opponent) = game |> Game.Normal.players in
@@ -38,9 +38,8 @@ end) = struct
       |- fst
     in
     let board = game |> Game.Normal.board in
-    (1 -- 7)
+    (0 -- 6)
     |> map (fun column -> Board.drop mover column board)
     |> map (minimax depth mover (opponent, mover) lose)
     |> max_index
-    |> (+) 1
 end

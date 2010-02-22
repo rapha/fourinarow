@@ -219,7 +219,7 @@ let _ =
         end) in
 
         TestAI.choose_column 0 (TestGame.create Player.A Player.B) |>
-        assert_equal 4
+        assert_equal 3
         );
   ]) |> ignore;
 

@@ -6,7 +6,7 @@ let winner = ref None
 
 let prompt_column _ =
   printf "column: "; flush stdout;
-  input_line stdin |> int_of_string
+  input_line stdin |> int_of_string |> flip (-) 1
 
 let on_win = function
   | Win a -> winner := Some a

@@ -12,7 +12,7 @@ let _ =
   let button_row =
     let button col =
       let drop_command _ = 
-        game := play_turn (fun _ -> col + 1) !game in
+        game := play_turn (fun _ -> col) !game in
       Button.create ~text:"v" ~command:drop_command widget in
     map button (0 -- 6) |> List.of_enum in
 
@@ -26,7 +26,7 @@ let _ =
   let on_drop = function
     | Drop (row, col, player) -> 
         let piece = Label.create ~text:"    " ~background:(colour player) widget in
-        grid ~row:(7-row) ~column:(col-1) [piece]
+        grid ~row:(7-row) ~column:col [piece]
     | _ -> () in
 
   let on_switch = function
