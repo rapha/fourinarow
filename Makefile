@@ -1,31 +1,15 @@
-SOURCES=player.ml board.ml game.ml ai.ml
-OBJECTS=player.cmx board.cmx game.cmx ai.cmx
+all: test tbui gui
 
-all: run_tests tbui gui
+test: 
+	ocamlfind batteries/ocamlbuild -cflags -package,oUnit -lflags -package,oUnit test.native
+	./test.native
 
-run_tests: tests
-	./run_tests
+tbui: 
+	ocamlfind batteries/ocamlbuild tbui.p.native
 
-gui: $(OBJECTS) gui.cmx
-	ocamlfind batteries/ocamlopt -o gui -g -linkpkg $(OBJECTS) -package labltk gui.cmx
-
-tbui: $(OBJECTS) tbui.cmx
-	ocamlfind batteries/ocamlopt -o tbui -g -linkpkg $(OBJECTS) tbui.cmx
-
-tests: $(OBJECTS) test.cmx
-	ocamlfind batteries/ocamlopt -o run_tests -g -linkpkg -package oUnit $(OBJECTS) test.cmx
-
-$(OBJECTS) : $(SOURCES)
-	ocamlfind batteries/ocamlopt -c -g $(SOURCES)
-
-test.cmx: $(OBJECTS) test.ml
-	ocamlfind batteries/ocamlopt -c -g -package oUnit test.ml
-
-tbui.cmx: tbui.ml
-	ocamlfind batteries/ocamlopt -c -g tbui.ml
-
-gui.cmx: gui.ml
-	ocamlfind batteries/ocamlopt -c -g -package labltk gui.ml
+gui: 
+	ocamlfind batteries/ocamlbuild -cflags -package,labltk -lflags -package,labltk gui.native
 
 clean:
-	rm *.cmi *.cmo *.cmx *.o run_tests tbui gui
+	ocamlbuild -clean
+
