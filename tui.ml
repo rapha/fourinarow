@@ -4,6 +4,10 @@ module AI = Ai.Make(Board)
 
 let winner = ref None
 
+let depth =
+  try Sys.argv.(1) |> int_of_string
+  with _ -> 4
+
 let prompt_column _ =
   printf "column: "; flush stdout;
   input_line stdin |> int_of_string |> flip (-) 1
@@ -25,7 +29,7 @@ let rec loop game =
         if player = Player.A then
           prompt_column
         else
-          AI.choose_column 6
+          AI.choose_column depth
       in
       let play move = play_turn move game in
       choose_column |> play |> print |> loop
