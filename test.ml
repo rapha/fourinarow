@@ -5,7 +5,7 @@ open OUnit
 let _ =
   let move _ = 3 in
 
-  run_test_tt ("Player" >::: [
+  run_test_tt_main ("Player" >::: [
       "to_string A" >:: (fun() ->
         Player.A |> Player.to_string |> assert_equal "A"
       );
@@ -13,7 +13,7 @@ let _ =
         Player.B |> Player.to_string |> assert_equal "B"
       );
   ]) |> ignore;
-  run_test_tt ("Board.wins" >::: [
+  run_test_tt_main ("Board.wins" >::: [
       "false for empty" >:: (fun() ->
         Board.empty |> Board.wins Player.A |> assert_equal false
       );
@@ -92,7 +92,7 @@ let _ =
       );
   ]) |> ignore;
 
-  run_test_tt ("game" >::: [
+  run_test_tt_main ("game" >::: [
     "uses argument passed in to get row to drop in" >:: (fun() ->
       let col = ref None in
       let module TestGame = Game.Make (struct include Board
@@ -142,7 +142,7 @@ let _ =
     );
   ]) |> ignore;
 
-  run_test_tt ("AI" >::: [
+  run_test_tt_main ("AI" >::: [
       "minimax returns 0 if empty" >:: (fun() ->
         let module TestAI = Ai.Make(Board) in
         Board.empty |> TestAI.minimax 0 Player.A (Player.A,Player.B) TestAI.winning_score |>
