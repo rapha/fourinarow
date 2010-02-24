@@ -145,7 +145,7 @@ let _ =
   run_test_tt ("AI" >::: [
       "minimax returns 0 if empty" >:: (fun() ->
         let module TestAI = Ai.Make(Board) in
-        Board.empty |> TestAI.minimax 0 Player.A (Player.A,Player.B) TestAI.win |>
+        Board.empty |> TestAI.minimax 0 Player.A (Player.A,Player.B) TestAI.winning_score |>
         assert_equal 0.
       );
       "minimax returns -Inf if opponent has won" >:: (fun() ->
@@ -153,15 +153,15 @@ let _ =
           let wins player board =
             player = Player.B
         end) in
-        TestAI.minimax 0 Player.A (Player.A,Player.B) TestAI.win Board.empty |>
-        assert_equal ~printer:string_of_float TestAI.lose
+        TestAI.minimax 0 Player.A (Player.A,Player.B) TestAI.winning_score Board.empty |>
+        assert_equal ~printer:string_of_float TestAI.losing_score
       );
       "minimax with depth 0 returns value from eval function" >:: (fun() ->
         let module TestAI = Ai.Make (struct include Board
           let evaluate _ _ = 5.
         end) in
 
-        TestAI.minimax 0 Player.A (Player.A, Player.B) TestAI.win Board.empty |>
+        TestAI.minimax 0 Player.A (Player.A, Player.B) TestAI.winning_score Board.empty |>
         assert_equal 5.
         );
       "minimax with depth 1 returns Inf if column makes player win" >:: (fun() ->
@@ -172,8 +172,8 @@ let _ =
             | _         -> false
         end) in
 
-        TestAI.minimax 1 Player.A (Player.A, Player.B) TestAI.win Board.empty |>
-        assert_equal ~printer:string_of_float TestAI.win
+        TestAI.minimax 1 Player.A (Player.A, Player.B) TestAI.winning_score Board.empty |>
+        assert_equal ~printer:string_of_float TestAI.winning_score
         );
       "minimax with depth 1 returns highest values from eval function after 1 turn" >:: (fun() ->
         let module TestAI = Ai.Make (struct include Board
@@ -183,7 +183,7 @@ let _ =
             | _         ->  0.
         end) in
 
-        TestAI.minimax 1 Player.A (Player.A, Player.B) TestAI.win Board.empty |>
+        TestAI.minimax 1 Player.A (Player.A, Player.B) TestAI.winning_score Board.empty |>
         assert_equal ~printer:string_of_float 5.
         );
       "minimax with depth 2 returns highest of lowest eval values after 2 turns" >:: (fun() ->
@@ -194,13 +194,13 @@ let _ =
             col_with_A |> ( * ) (-1) |> float_of_int
         end) in
 
-        TestAI.minimax 2 Player.A (Player.A, Player.B) TestAI.win Board.empty |>
+        TestAI.minimax 2 Player.A (Player.A, Player.B) TestAI.winning_score Board.empty |>
         assert_equal ~printer:string_of_float (-1.)
         );
       "minimax returns an -Inf value for a full column" >:: (fun() ->
         let module TestAI = Ai.Make (Board) in
 
-        TestAI.minimax 1 Player.A (Player.A, Player.B) TestAI.win (Board.build [
+        TestAI.minimax 1 Player.A (Player.A, Player.B) TestAI.winning_score (Board.build [
               "BABBBAB";
               "ABAAABA";
               "BABBBAB";
@@ -208,7 +208,7 @@ let _ =
               "BABBBAB";
               "ABAAABA";
             ]) |>
-        assert_equal TestAI.lose
+        assert_equal TestAI.losing_score
         );
       "choose_column will return the move with the highest score" >:: (fun() ->
         let module TestAI = Ai.Make (struct include Board
