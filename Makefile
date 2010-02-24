@@ -1,13 +1,13 @@
-all: test tui gui
+all: test
 
 test: 
 	ocamlfind batteries/ocamlbuild -cflags -package,oUnit -lflags -package,oUnit test.native
 	./test.native
 
-tui:
+tui: test
 	ocamlfind batteries/ocamlbuild tui.p.native
 
-gui: 
+gui: test
 	ocamlfind batteries/ocamlbuild -cflags -package,labltk -lflags -package,labltk gui.native
 
 clean:
