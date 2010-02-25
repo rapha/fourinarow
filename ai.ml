@@ -13,12 +13,12 @@ end) = struct
     let best, worst = if player = mover then (max,min) else (min,max) in
     let fail = worst winning_score losing_score in
     if Board.wins opponent board then
-      fail /. (depth + 1 |> float_of_int) (* winning sooner is worse than winning later *)
+      fail /. (depth + 1 |> float_of_int) (* winning sooner has a higher weight than winning later *)
     else
       if depth <= 0 then
         Board.evaluate player board
       else
-        let child_score_with_limit = child_score (depth-1) board mover players (worst full_score (full_score *. -1.)) in
+        let child_score_with_limit = child_score (depth-1) board mover players in
         let rec best_child_score champion = function
           | [] -> champion
           | column :: rest ->
@@ -32,22 +32,23 @@ end) = struct
         in
         best_child_score fail (0 -- 6 |> List.of_enum)
 
-  and child_score depth board mover (player, opponent) full limit_score column =
+  and child_score depth board mover (player, opponent) limit_score column =
     try
       board |> Board.drop player column |> minimax depth mover (opponent, player) limit_score
     with
-      Failure "column full" -> full
+      Failure "column full" ->
+        if player = mover then full_score else (full_score *. -1.)
 
 
   let choose_column depth game =
     let (mover, opponent) as players = game |> Game.Normal.players in
     let max_index =
       Enum.foldi (fun index value (maxi,max) ->
-        if value >= max then (index,value) else (maxi,max)) (-1, losing_score)
+        if value >= max then (index,value) else (maxi,max)) (-1, full_score)
       |- fst
     in
     let board = game |> Game.Normal.board in
     (0 -- 6)
-    |> map (child_score depth board mover players full_score losing_score)
+    |> map (child_score depth board mover players full_score)
     |> max_index
 end
