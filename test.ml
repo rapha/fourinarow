@@ -216,8 +216,8 @@ let _ =
             raise (Board.Column_full col)
         end) in
 
-        TestAI.minimax 1 Player.A (Player.A, Player.B) TestAI.full_score Board.empty |>
-        assert_equal TestAI.full_score
+        TestAI.minimax 1 Player.A (Player.A, Player.B) TestAI.column_full_score Board.empty |>
+        assert_equal TestAI.column_full_score
         );
       "choose_column will return the move with the highest score" >:: (fun() ->
         let module TestAI = Ai.Make (struct include Board

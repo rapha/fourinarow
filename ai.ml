@@ -8,7 +8,7 @@ end) = struct
 
   let losing_score = -100.
   let winning_score = losing_score *. -1.
-  let full_score = neg_infinity
+  let column_full_score = neg_infinity
 
   let rec minimax depth mover ((player, opponent) as players) limit_score board =
     let best, worst = if player = mover then (max,min) else (min,max) in
@@ -38,18 +38,18 @@ end) = struct
       board |> Board.drop player column |> minimax depth mover (opponent, player) limit_score
     with
       Board.Column_full _ ->
-        if player = mover then full_score else (full_score *. -1.)
+        if player = mover then column_full_score else (column_full_score *. -1.)
 
 
   let choose_column depth game =
     let (mover, opponent) as players = game |> Game.Normal.players in
     let max_index =
       Enum.foldi (fun index value (maxi,max) ->
-        if value >= max then (index,value) else (maxi,max)) (-1, full_score)
+        if value >= max then (index,value) else (maxi,max)) (-1, column_full_score)
       |- fst
     in
     let board = game |> Game.Normal.board in
     (0 -- 6)
-    |> map (child_score depth board mover players full_score)
+    |> map (child_score depth board mover players column_full_score)
     |> max_index
 end
