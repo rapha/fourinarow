@@ -1,5 +1,6 @@
 module Make (Board : sig
   type t = Board.t
+  exception Column_full of int
   val wins : Player.t -> t -> bool
   val drop : Player.t -> int -> t -> t
   val evaluate : Player.t -> t -> float
@@ -36,7 +37,7 @@ end) = struct
     try
       board |> Board.drop player column |> minimax depth mover (opponent, player) limit_score
     with
-      Failure "column full" ->
+      Board.Column_full _ ->
         if player = mover then full_score else (full_score *. -1.)
 
 

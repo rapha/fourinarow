@@ -212,8 +212,8 @@ let _ =
         );
       "minimax with depth 1 returns an full score value for a full column" >:: (fun() ->
         let module TestAI = Ai.Make (struct include Board
-          let drop _ _ _ = 
-            failwith "column full"
+          let drop _ col _ =
+            raise (Board.Column_full col)
         end) in
 
         TestAI.minimax 1 Player.A (Player.A, Player.B) TestAI.full_score Board.empty |>

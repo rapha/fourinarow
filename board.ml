@@ -1,8 +1,9 @@
 type t = Board of Player.t option list list
+exception Column_full of int
 
 (* locally add some handy functions to the List module *)
 
-module List_ = struct
+module List = struct
   include List
 
   let rotate_left i vector =
@@ -27,7 +28,6 @@ module List_ = struct
         | (_, y::rest_tail) -> rest_contains sub_list rest_tail
     in rest_contains sub_list full_list
 end
-module List = List_
 
 (* private *)
 
@@ -53,7 +53,7 @@ let empty = Board (List.make row_length [])
 let drop player col board =
   let cols = columns board in
   let column = List.nth cols col in
-  if (List.length column >= col_length) then failwith "column full" else
+  if (List.length column >= col_length) then raise (Column_full col) else
   let new_column = column @ [Some player] and
       before = (List.take col cols) and
       after  = (List.drop (col+1) cols)
