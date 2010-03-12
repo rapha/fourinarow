@@ -1,5 +1,5 @@
 module Make (Board : sig
-  type t = Board.t
+  type t = Board.Make(Player).t
   exception Column_full of int
   val wins : Player.t -> t -> bool
   val drop : Player.t -> int -> t -> t

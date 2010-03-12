@@ -43,4 +43,4 @@ end) = struct
     | { current_player = current; other_player = other } -> (current, other)
 end
 
-module Normal = Make (Board)
+module Normal = Make (Board.Make(Player))

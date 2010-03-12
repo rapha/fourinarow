@@ -1,4 +1,5 @@
 module TestGame = Game.Normal
+module Board = Board.Make(Player)
 
 open OUnit
 
