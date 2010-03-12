@@ -26,12 +26,12 @@ end) = struct
       let cross_section i = matrix |> List.map (fun vector -> try List.nth vector i with List.Invalid_index _ -> None) in
       List.map cross_section (List.init len identity)
 
-    let contains sub_list full_list =
+    let contains eq sub_list full_list =
       let rec rest_contains sub rest =
         match (sub, rest) with
           | ([], _) -> true
           | (_, []) -> false
-          | (x::sub_tail, y::rest_tail) when x = y -> rest_contains sub_tail rest_tail
+          | (x::sub_tail, y::rest_tail) when (eq x y) -> rest_contains sub_tail rest_tail
           | (_, y::rest_tail) -> rest_contains sub_list rest_tail
       in rest_contains sub_list full_list
   end
@@ -67,10 +67,15 @@ end) = struct
     in Board (before @ [new_column] @ after)
 
   let wins player board =
+    let player_option_eq a b = match (a, b) with
+      | (Some a), (Some b) -> Player.eq a b
+      | None, None -> true
+      | _ -> false
+    in
     let four_in_a_row = List.make 4 (Some player) in
     [columns; rows; north_east; north_west]
     |> List.map ((|>) board)
-    |> List.exists (List.exists (List.contains four_in_a_row))
+    |> List.exists (List.exists (List.contains player_option_eq four_in_a_row))
 
   let top_row col board =
     List.nth (columns board) col |> List.filter Option.is_some |> List.length
