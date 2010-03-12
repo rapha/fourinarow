@@ -1,6 +1,6 @@
 open Game.Normal
 open Printf
-module AI = Ai.Make(Board)
+module AI = Ai.Make(Board.Make(Player))
 
 let winner = ref None
 
