@@ -11,7 +11,7 @@ end) = struct
   let column_full_score = neg_infinity
 
   let rec minimax depth mover ((player, opponent) as players) limit_score board =
-    let best, worst = if player = mover then (max,min) else (min,max) in
+    let best, worst = if Player.eq player mover then (max,min) else (min,max) in
     let fail = worst winning_score losing_score in
     if Board.wins opponent board then
       fail /. (depth + 1 |> float_of_int) (* winning sooner has a higher weight than winning later *)
@@ -38,7 +38,7 @@ end) = struct
       board |> Board.drop player column |> minimax depth mover (opponent, player) limit_score
     with
       Board.Column_full _ ->
-        if player = mover then column_full_score else (column_full_score *. -1.)
+        if Player.eq player mover then column_full_score else (column_full_score *. -1.)
 
 
   let choose_column depth game =
