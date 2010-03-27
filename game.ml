@@ -5,7 +5,17 @@ module Make (Board : sig
   val wins : Piece.t -> t -> bool 
   val top_row : int -> t -> int
   val to_string : t -> string
-end) = struct
+end) : sig
+  type t
+  val create : (Player.t * Player.t) -> t
+  val play_turn : t -> t
+  val on_win : (Piece.t -> unit) -> t -> t
+  val on_switch : (Piece.t -> unit) -> t -> t
+  val on_drop : ((int * int * Piece.t) -> unit) -> t -> t
+  val to_string : t -> string
+  val board : t -> Board.t
+  val players : t -> (Player.t * Player.t)
+end = struct
 
   type event = Drop of (int * int * Piece.t) | Switch of Piece.t | Win of Piece.t
 
@@ -34,6 +44,10 @@ end) = struct
 
   let handle handler game = match game with
     | { event_handlers = handlers } -> { game with event_handlers = handler::handlers }
+
+  let on_drop   handler = handle (function Drop args -> handler args | _ -> ())
+  let on_win    handler = handle (function Win args -> handler args | _ -> ())
+  let on_switch handler = handle (function Switch args -> handler args | _ -> ())
 
   let to_string = function
     | { board = board } -> Board.to_string board

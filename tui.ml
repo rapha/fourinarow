@@ -12,10 +12,6 @@ let prompt_column _ _ =
   printf "column: "; flush stdout;
   input_line stdin |> int_of_string |> flip (-) 1
 
-let on_win = function
-  | TuiGame.Win a -> winner := Some a
-  | _ -> ()
-
 let print game =
   game |> TuiGame.to_string |> printf "%s\n"; flush stdout;
   game
@@ -27,4 +23,4 @@ let rec loop game =
 
 let _ =
   let players = Player.create_pair prompt_column (TuiAi.choose_column depth) in
-  TuiGame.create players |> TuiGame.handle on_win |> loop
+  TuiGame.create players |> TuiGame.on_win (fun piece -> winner := Some piece) |> loop

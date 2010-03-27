@@ -115,27 +115,27 @@ let _ =
       );
       "calls drop handler" >:: (fun() ->
         let drop_handled = ref false in
-        let handler = function TestGame.Drop (1,3,Piece.A) -> drop_handled := true | _ -> () in
+        let handler = function (1,3,Piece.A) -> drop_handled := true | _ -> () in
 
-        Player.create_pair (drop_in 3) (drop_in 2) |> TestGame.create |> TestGame.handle handler |> 
+        Player.create_pair (drop_in 3) (drop_in 2) |> TestGame.create |> TestGame.on_drop handler |> 
         TestGame.play_turn |> ignore;
 
         assert_equal !drop_handled true
       );
       "calls switch player handler" >:: (fun() ->
         let switch_handled = ref false in
-        let handler = function TestGame.Switch Piece.B -> switch_handled := true | _ -> () in
+        let handler = function Piece.B -> switch_handled := true | _ -> () in
 
-        Player.create_pair (drop_in 1) (drop_in 2) |> TestGame.create |> TestGame.handle handler |> 
+        Player.create_pair (drop_in 1) (drop_in 2) |> TestGame.create |> TestGame.on_switch handler |> 
         TestGame.play_turn |> ignore;
 
         assert_equal !switch_handled true
       );
       "calls win handler" >:: (fun() ->
         let win_handled = ref false in
-        let handler = function TestGame.Win Piece.A -> win_handled := true | _ -> () in
+        let handler = function Piece.A -> win_handled := true | _ -> () in
         let play_turn = TestGame.play_turn in
-        let game = Player.create_pair (drop_in 1) (drop_in 2) |> TestGame.create |> TestGame.handle handler |>
+        let game = Player.create_pair (drop_in 1) (drop_in 2) |> TestGame.create |> TestGame.on_win handler |>
                                       play_turn |> play_turn |>
                                       play_turn |> play_turn |>
                                       play_turn |> play_turn in
@@ -146,8 +146,8 @@ let _ =
       );
       "toggles current piece" >:: (fun() ->
         let history = ref [] in
-        let handler = function TestGame.Switch a -> history := (a :: !history) | _ -> () in
-        Player.create_pair (drop_in 3) (drop_in 2) |> TestGame.create |> TestGame.handle handler |>
+        let handler a = history := (a :: !history) in
+        Player.create_pair (drop_in 3) (drop_in 2) |> TestGame.create |> TestGame.on_switch handler |>
 
         TestGame.play_turn |> TestGame.play_turn |> TestGame.play_turn |> ignore;
 

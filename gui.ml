@@ -26,23 +26,18 @@ let _ =
     done
   done;
 
-  let on_drop = function
-    | GuiGame.Drop (row, col, player) -> 
-        let piece = Label.create ~text:"    " ~background:(colour player) widget in
-        grid ~row:(7-row) ~column:col [piece]
-    | _ -> () in
+  let drop_handler (row, col, piece) =
+    let piece = Label.create ~text:"    " ~background:(colour piece) widget in
+    grid ~row:(7-row) ~column:col [piece] in
 
-  let on_switch = function
-    | GuiGame.Switch player -> List.iter (fun button -> Button.configure button ~highlightbackground:(colour player)) button_row
-    | _ -> () in
+  let switch_handler player =
+    List.iter (fun button -> Button.configure button ~highlightbackground:(colour player)) button_row in
 
-  let on_win = function
-    | GuiGame.Win player -> 
-        let message = (name player) ^ " wins" in 
-        Dialog.create ~parent:widget ~title:"MyGame Over" ~message:message ~buttons:["OK"] ~default:0 () |> ignore;
-        closeTk ()
-    | _ -> () in
+  let win_handler player =
+    let message = (name player) ^ " wins" in 
+    Dialog.create ~parent:widget ~title:"MyGame Over" ~message:message ~buttons:["OK"] ~default:0 () |> ignore;
+    closeTk () in
 
-  game := !game |> GuiGame.handle on_drop |> GuiGame.handle on_win |> GuiGame.handle on_switch;
+  game := !game |> GuiGame.on_drop drop_handler |> GuiGame.on_win win_handler |> GuiGame.on_switch switch_handler;
 
   Printexc.print mainLoop ()
