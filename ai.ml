@@ -17,7 +17,7 @@ end) = struct
       fail /. (depth + 1 |> float_of_int) (* winning sooner has a higher weight than winning later *)
     else
       if depth <= 0 then
-        Board.evaluate current_piece board
+        Board.evaluate mover board
       else
         let child_score_with_limit = child_score (depth-1) board mover pieces in
         let rec best_child_score champion = function
