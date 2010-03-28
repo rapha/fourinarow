@@ -3,27 +3,26 @@ exception Column_full of int
 
 (* some handy functions on List *)
 
-  let rotate_left i vector =
-    List.drop i vector @ List.take i vector
+let rotate_left n xs =
+  List.drop n xs @ List.take n xs
 
-  let rotate_right i =
-    List.rev |- rotate_left i |- List.rev
+let rotate_right n =
+  List.rev |- rotate_left n |- List.rev
 
-  let trim predicate =
-    List.dropwhile predicate |- List.rev |- List.dropwhile predicate |- List.rev
+let trim predicate =
+  List.dropwhile predicate |- List.rev |- List.dropwhile predicate |- List.rev
 
-  let transpose len matrix =
-    let cross_section i = matrix |> List.map (fun vector -> try List.nth vector i with List.Invalid_index _ -> None) in
-    List.map cross_section (List.init len identity)
+let transpose len matrix =
+  let cross_section i = matrix |> List.map (fun vector -> try List.nth vector i with List.Invalid_index _ -> None) in
+  List.map cross_section (List.init len identity)
 
-  let contains eq sub_list full_list =
-    let rec rest_contains sub rest =
-      match (sub, rest) with
-        | ([], _) -> true
-        | (_, []) -> false
-        | (x::sub_tail, y::rest_tail) when (eq x y) -> rest_contains sub_tail rest_tail
-        | (_, y::rest_tail) -> rest_contains sub_list rest_tail
-    in rest_contains sub_list full_list
+let contains sub_list full_list =
+  let rec rest_contains sub rest = match (sub, rest) with
+    | ([], _) -> true
+    | (_, []) -> false
+    | (x::sub_tail, y::rest_tail) when x = y -> rest_contains sub_tail rest_tail
+    | (_, y::rest_tail) -> rest_contains sub_list rest_tail
+  in rest_contains sub_list full_list
 
 (* private *)
 
@@ -56,15 +55,10 @@ let drop player col board =
   in Board (before @ [new_column] @ after)
 
 let wins player board =
-  let player_option_eq a b = match (a, b) with
-    | (Some a), (Some b) -> a = b
-    | None, None -> true
-    | _ -> false
-  in
   let four_in_a_row = List.make 4 (Some player) in
   [columns; rows; north_east; north_west]
   |> List.map ((|>) board)
-  |> List.exists (List.exists (contains player_option_eq four_in_a_row))
+  |> List.exists (List.exists (contains four_in_a_row))
 
 let top_row col board =
   List.nth (columns board) col |> List.filter Option.is_some |> List.length

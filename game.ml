@@ -13,8 +13,6 @@ end) : sig
   val on_switch : (Piece.t -> unit) -> t -> t
   val on_drop : ((int * int * Piece.t) -> unit) -> t -> t
   val to_string : t -> string
-  val board : t -> Board.t
-  val players : t -> (Player.t * Player.t)
 end = struct
 
   type event = Drop of (int * int * Piece.t) | Switch of Piece.t | Win of Piece.t
@@ -30,9 +28,8 @@ end = struct
 
   let play_turn game = match game with
     | { current_player = a; other_player = b; board = board; event_handlers = handlers } ->
-      let move = Player.move a in
-      let piece_a, piece_b as pieces = Player.piece a, Player.piece b in
-      let col = (move board pieces) in
+      let piece_a, piece_b = Player.piece a, Player.piece b in
+      let col = a |> Player.next_move board in
       let new_board = Board.drop piece_a col board in
       let row = Board.top_row col new_board in
       let fire event =
@@ -52,9 +49,4 @@ end = struct
   let to_string = function
     | { board = board } -> Board.to_string board
 
-  let board = function
-    | { board = board } -> board
-
-  let players = function
-    | { current_player = current; other_player = other } -> (current, other)
 end
