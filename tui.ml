@@ -10,7 +10,7 @@ let depth =
 
 let prompt_column _ _ =
   printf "column: "; flush stdout;
-  input_line stdin |> int_of_string |> flip (-) 1
+  input_line stdin |> int_of_string |> pred
 
 let print game =
   game |> TuiGame.to_string |> printf "%s\n"; flush stdout;
