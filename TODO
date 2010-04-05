@@ -1,5 +1,3 @@
 - need to deal with the situation where all columns are full. This means a draw.
-- clean up the messy use of modules
-  - move choose_column function into the player module?
 - for better game-play, randomise the choice from equal-valued moves
   - but ensure tests are deterministic
