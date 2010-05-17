@@ -69,7 +69,8 @@ let to_string =
   rows |- List.rev |- List.map row_to_string |- List.reduce (^)
 
 let build rows =
-  let cols = rows |> List.map (Str.split (Str.regexp "") |- List.map Piece.of_string) |> transpose row_length in
+  let try_parse_piece s = try Some (Piece.of_string s) with _ -> None in
+  let cols = rows |> List.map (Str.split (Str.regexp "") |- List.map try_parse_piece) |> transpose row_length in
   Board cols
 
 let evaluate _ _ = 0.

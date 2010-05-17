@@ -7,12 +7,12 @@ let _ =
   let drop_in col _ _ = col in
 
   run_test_tt_main ("unit tests" >::: [
-    ("Player.to_string" >::: [
-        "A" >:: (fun() ->
-          Piece.A |> Piece.to_string |> assert_equal "A"
+    ("Player.to_string and Player.of_string are inverse" >::: [
+        "piece -> string -> piece" >:: (fun() ->
+          Piece.A |> Piece.to_string |> Piece.of_string |> assert_equal Piece.A
         );
-        "B" >:: (fun() ->
-          Piece.B |> Piece.to_string |> assert_equal "B"
+        "string -> piece -> string" >:: (fun() ->
+          "A" |> Piece.of_string |> Piece.to_string |> assert_equal "A"
         );
     ]);
     ("Board" >::: [
