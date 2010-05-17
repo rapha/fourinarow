@@ -2,7 +2,7 @@ module Make (Board : sig
   type t = Board.t
   val empty : t
   val drop : Piece.t -> int -> t -> t
-  val wins : Piece.t -> t -> bool 
+  val has_won : Piece.t -> t -> bool 
   val top_row : int -> t -> int
   val to_string : t -> string
 end) : sig
@@ -36,7 +36,7 @@ end = struct
         List.iter ((|>) event) handlers in
       fire (Drop (row,col,piece_a));
       fire (Switch piece_b);
-      if Board.wins piece_a new_board then fire (Win piece_a);
+      if Board.has_won piece_a new_board then fire (Win piece_a);
       { game with current_player = b; other_player = a; board = new_board }
 
   let handle handler game = match game with

@@ -4,7 +4,7 @@ open Tk
 let _ =
   let chosen_col = ref 4 in
   let use_chosen_col _ _ = !chosen_col in
-  let game = ref (Player.create_pair use_chosen_col use_chosen_col |> GuiGame.create) in
+  let game = ref (Player.create_pair (use_chosen_col,use_chosen_col) |> GuiGame.create) in
 
   let colour = function Piece.A -> `Yellow | Piece.B -> `Red in
   let name = function Piece.A -> "Yellow" | Piece.B -> "Red" in
@@ -34,7 +34,7 @@ let _ =
     List.iter (fun button -> Button.configure button ~highlightbackground:(colour player)) button_row in
 
   let win_handler player =
-    let message = (name player) ^ " wins" in 
+    let message = (name player) ^ " has won" in 
     Dialog.create ~parent:widget ~title:"MyGame Over" ~message:message ~buttons:["OK"] ~default:0 () |> ignore;
     closeTk () in
 

@@ -18,9 +18,9 @@ let print game =
 
 let rec loop game =
   match !winner with
-  | Some p -> p |> Piece.to_string |> printf "%s wins\n"
+  | Some p -> p |> Piece.to_string |> printf "%s has won\n"
   | None -> game |> TuiGame.play_turn |> print |> loop
 
 let _ =
-  let players = Player.create_pair prompt_column (TuiAi.choose_column depth) in
+  let players = Player.create_pair (prompt_column, TuiAi.choose_column depth) in
   TuiGame.create players |> TuiGame.on_win (fun piece -> winner := Some piece) |> loop

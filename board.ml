@@ -54,7 +54,7 @@ let drop player col board =
       after  = (List.drop (col+1) cols)
   in Board (before @ [new_column] @ after)
 
-let wins player board =
+let has_won player board =
   let four_in_a_row = List.make 4 (Some player) in
   [columns; rows; north_east; north_west]
   |> List.map ((|>) board)
