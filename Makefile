@@ -1,14 +1,14 @@
 all: test
 
 test: 
-	ocamlfind batteries/ocamlbuild -cflags -package,oUnit -lflags -package,oUnit test.native
+	ocamlbuild -cflags -package,oUnit -lflags -package,oUnit,-thread test.native
 	./test.native
 
 tui: test
-	ocamlfind batteries/ocamlbuild tui.p.native
+	ocamlbuild -lflags -thread tui.native
 
 gui: test
-	ocamlfind batteries/ocamlbuild -cflags -package,labltk -lflags -package,labltk gui.native
+	ocamlbuild -cflags -I,+labltk -lflags -I,+labltk,-thread -lib labltk gui.native
 
 clean:
 	ocamlbuild -clean

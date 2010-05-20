@@ -1,3 +1,5 @@
+open Batteries
+
 module Make (Board : sig
   type t = Board.t
   exception Column_full of int

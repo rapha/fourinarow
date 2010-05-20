@@ -1,3 +1,5 @@
+open Batteries
+
 module TestGame = Game.Make(Board)
 
 open OUnit

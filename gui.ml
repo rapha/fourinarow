@@ -1,3 +1,5 @@
+open Batteries
+
 module GuiGame = Game.Make(Board)
 open Tk
 
@@ -40,4 +42,4 @@ let _ =
 
   game := !game |> GuiGame.on_drop drop_handler |> GuiGame.on_win win_handler |> GuiGame.on_switch switch_handler;
 
-  Printexc.print mainLoop ()
+  mainLoop ()

@@ -1,3 +1,6 @@
+
+open Batteries
+
 module Make (Board : sig
   type t = Board.t
   val empty : t

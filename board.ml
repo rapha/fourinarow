@@ -1,3 +1,5 @@
+open Batteries
+
 type t = Board of Piece.t option list list
 exception Column_full of int
 
@@ -13,7 +15,7 @@ let trim predicate =
   List.dropwhile predicate |- List.rev |- List.dropwhile predicate |- List.rev
 
 let transpose len matrix =
-  let cross_section i = matrix |> List.map (fun vector -> try List.nth vector i with List.Invalid_index _ -> None) in
+  let cross_section i = matrix |> List.map (fun vector -> try List.nth vector i with Invalid_argument _ -> None) in
   List.map cross_section (List.init len identity)
 
 let contains sub_list full_list =
