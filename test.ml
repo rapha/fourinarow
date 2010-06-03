@@ -99,12 +99,12 @@ let _ =
       (".to_string" >::: [
         "for empty board is 6 row by 7 cols of -" >:: (fun() ->
           Board.empty |> Board.to_string |> assert_equal (
-            "-------\n" ^
-            "-------\n" ^
-            "-------\n" ^
-            "-------\n" ^
-            "-------\n" ^
-            "-------\n" ) 
+            "- - - - - - -\n" ^
+            "- - - - - - -\n" ^
+            "- - - - - - -\n" ^
+            "- - - - - - -\n" ^
+            "- - - - - - -\n" ^
+            "- - - - - - -\n" ) 
             ~printer:(identity)
         );
       ]);
@@ -207,7 +207,7 @@ let _ =
           let module TestAI = Ai.Make (struct include Board
             let evaluate player board =
               match board |> to_string |> lines |> List.last with
-              | "-A-----" ->  5.
+              | "- A - - - - -" ->  5.
               | _         ->  0.
           end) in
 
@@ -219,7 +219,7 @@ let _ =
             let evaluate player board =
               let bottom_row = board |> to_string |> lines |> List.last in
               let col_with piece = 
-                try Str.search_forward (Str.regexp (piece |> Piece.to_string)) bottom_row 0 |> (+) 1
+                try Str.search_forward (Str.regexp (piece |> Piece.to_string)) bottom_row 0 |> flip (lsr) 1 |> (+) 1
                 with Not_found -> 0
               in
               (col_with Piece.A) + (col_with Piece.B) |> ( * ) (-1) |> float_of_int
@@ -243,7 +243,7 @@ let _ =
             let module Board = struct include Board
               let evaluate _ board =
                 match board |> to_string |> lines |> List.last with
-                | "---A---" -> 1.
+                | "- - - A - - -" -> 1.
                 | _         -> 0.
             end in
             let module TestAI = Ai.Make (Board) in
