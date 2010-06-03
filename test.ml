@@ -18,6 +18,15 @@ let _ =
         );
     ]);
     ("Board" >::: [
+      ".drop" >::: [
+        "in an empty column will put a piece on the first row of that column" >:: (fun() ->
+          let expected = (Board.build [
+            "A------";
+          ]) |> Board.to_string in
+
+          Board.empty |> Board.drop Piece.A 0 |> Board.to_string |> assert_equal expected ~printer:identity
+        );
+      ];
       ".has_won" >::: [
         "is false for empty" >:: (fun() ->
           Board.empty |> Board.has_won Piece.A |> assert_equal false
@@ -95,10 +104,12 @@ let _ =
             "-------\n" ^
             "-------\n" ^
             "-------\n" ^
-            "-------\n" )
+            "-------\n" ) 
+            ~printer:(identity)
         );
       ]);
     ]);
+
 
     ("Game.play_turn" >::: [
       "uses function passed in to get row to drop in" >:: (fun() ->
@@ -159,11 +170,12 @@ let _ =
 
     ("AI" >::: [
       ".minimax" >::: [
+        
         "returns 0 if empty" >:: (fun() ->
           let module TestAI = Ai.Make(Board) in
 
           Board.empty |> TestAI.minimax 0 Piece.A Piece.A TestAI.winning_score |>
-          assert_equal 0.
+          assert_equal 0. ~printer:string_of_float
         );
         "returns losing score if opponent has won" >:: (fun() ->
           let module TestAI = Ai.Make (struct include Board
@@ -200,7 +212,7 @@ let _ =
           end) in
 
           TestAI.minimax 1 Piece.A Piece.A TestAI.winning_score Board.empty |>
-          assert_equal 5.
+          assert_equal 5. ~printer:string_of_float
           );
         "with depth 2 returns highest of lowest eval values after 2 turns" >:: (fun() ->
           let module TestAI = Ai.Make (struct include Board
@@ -214,7 +226,7 @@ let _ =
           end) in
 
           TestAI.minimax 2 Piece.A Piece.A TestAI.winning_score Board.empty |>
-          assert_equal (-8.)
+          assert_equal (-8.) ~printer:string_of_float
           );
         "with depth 1 returns an full score value for a full column" >:: (fun() ->
           let module TestAI = Ai.Make (struct include Board
@@ -237,7 +249,7 @@ let _ =
             let module TestAI = Ai.Make (Board) in
 
             TestAI.choose_column 0 Board.empty Piece.A |>
-            assert_equal ~printer:string_of_int 3
+            assert_equal 3 ~printer:string_of_int
             );
         ]);
       ]);
