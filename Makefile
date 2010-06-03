@@ -1,7 +1,7 @@
 all: test
 
 test: 
-	ocamlbuild -cflags -package,oUnit -lflags -package,oUnit,-thread test.native
+	ocamlbuild -cflags -package,oUnit,-g -lflags -package,oUnit,-thread test.native
 	./test.native
 
 tui: test
