@@ -58,9 +58,8 @@ let drop player col board =
 
 let has_won player board =
   let four_in_a_row = List.make 4 (Some player) in
-  [columns; rows; north_east; north_west]
-  |> List.map ((|>) board)
-  |> List.exists (List.exists (contains four_in_a_row))
+  let wins_along axis = List.exists (contains four_in_a_row) (axis board) in
+  wins_along columns || wins_along rows || wins_along north_east || wins_along north_west
 
 let top_row col board =
   List.nth (columns board) col |> List.filter Option.is_some |> List.length
