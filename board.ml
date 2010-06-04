@@ -19,12 +19,14 @@ let transpose len matrix =
   List.map cross_section (List.init len identity)
 
 let contains sub_list full_list =
-  let rec rest_contains sub rest = match (sub, rest) with
-    | ([], _) -> true
-    | (_, []) -> false
-    | (x::sub_tail, y::rest_tail) when x = y -> rest_contains sub_tail rest_tail
-    | (_, y::rest_tail) -> rest_contains sub_list rest_tail
-  in rest_contains sub_list full_list
+  full_list |> 
+  List.fold_left (fun still_to_find element ->
+    match still_to_find with
+    | [] -> []
+    | first::rest when first = element -> rest
+    | _  -> sub_list
+  ) sub_list |> 
+  List.is_empty
 
 (* private *)
 
