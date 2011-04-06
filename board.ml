@@ -22,12 +22,12 @@ let has_won piece =
   lines |- Lines.has_won piece
 
 let to_string =
-  columns |- Columns.to_string Piece.to_string
+  columns |- Columns.to_string (Piece.to_char |- String.of_char)
 
 let of_string str =
   let cell_of_char = function
     | '-' -> None
-    | ch -> Some (Piece.of_string (String.of_char ch))
+    | ch -> Some (Piece.of_char ch)
   in
   let cells = str 
     |> flip String.nsplit "\n"

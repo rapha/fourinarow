@@ -8,8 +8,7 @@ let _ =
   let use_chosen_col _ _ = !chosen_col in
   let game = ref (Player.create_pair (use_chosen_col,use_chosen_col) |> GuiGame.create) in
 
-  let colour = function Piece.A -> `Yellow | Piece.B -> `Red in
-  let name = function Piece.A -> "Yellow" | Piece.B -> "Red" in
+  let colour = function Piece.Yellow -> `Yellow | Piece.Red -> `Red in
 
   let widget = openTk () in
 
@@ -32,11 +31,11 @@ let _ =
     let piece = Label.create ~text:"    " ~background:(colour piece) widget in
     grid ~row:(6-(Row.to_int row)) ~column:(Col.to_int col) [piece] in
 
-  let switch_handler player =
-    List.iter (fun button -> Button.configure button ~highlightbackground:(colour player)) button_row in
+  let switch_handler piece =
+    List.iter (fun button -> Button.configure button ~highlightbackground:(colour piece)) button_row in
 
-  let win_handler player =
-    let message = (name player) ^ " has won" in 
+  let win_handler piece =
+    let message = (piece |> Piece.to_string) ^ " has won" in 
     Dialog.create ~parent:widget ~title:"MyGame Over" ~message:message ~buttons:["OK"] ~default:0 () |> ignore;
     closeTk () in
 

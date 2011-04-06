@@ -1,8 +1,18 @@
-type t = A | B
+type t = Yellow | Red 
 
-let to_string = function A -> "A" | B -> "B"
-let of_string = function "A" -> A | "B" -> B | s -> failwith (Printf.sprintf "invalid piece: %s" s)
+let to_string = function
+  | Yellow -> "Yellow" 
+  | Red -> "Red"
+
+let to_char = function
+  | Yellow -> 'Y'
+  | Red -> 'R'
+
+let of_char = function 
+  | 'Y' -> Yellow 
+  | 'R' -> Red 
+  | ch -> failwith (Printf.sprintf "invalid piece: %c" ch)
 
 let opponent = function
-  | A -> B
-  | B -> A
+  | Red -> Yellow
+  | Yellow -> Red
