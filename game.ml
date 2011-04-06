@@ -4,7 +4,7 @@ open Batteries
 module Make (Board : sig
   type t = Board.t
   val empty : t
-  val drop : Piece.t -> Col_index.t -> t -> (t * Row_index.t)
+  val drop : Piece.t -> Col.t -> t -> (t * Row.t)
   val has_won : Piece.t -> t -> bool 
   val to_string : t -> string
 end) : sig
@@ -13,11 +13,11 @@ end) : sig
   val play_turn : t -> t
   val on_win : (Piece.t -> unit) -> t -> t
   val on_switch : (Piece.t -> unit) -> t -> t
-  val on_drop : ((Row_index.t * Col_index.t * Piece.t) -> unit) -> t -> t
+  val on_drop : ((Row.t * Col.t * Piece.t) -> unit) -> t -> t
   val to_string : t -> string
 end = struct
 
-  type event = Drop of (Row_index.t * Col_index.t * Piece.t) | Switch of Piece.t | Win of Piece.t
+  type event = Drop of (Row.t * Col.t * Piece.t) | Switch of Piece.t | Win of Piece.t
 
   type t = { current_player : Player.t; other_player : Player.t; board : Board.t; event_handlers : (event -> unit) list }
 

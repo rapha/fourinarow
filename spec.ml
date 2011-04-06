@@ -23,7 +23,7 @@ let _ =
         end;
     ];
     describe "Board" begin 
-      let open Col_index in 
+      let open Col in 
       let equal_to_board = equal_to Board.to_string in
       [
       describe ".drop" [
@@ -196,12 +196,12 @@ let _ =
         let equal_to_col_option = 
           let string_of_col_option = function 
             | None -> "None" 
-            | Some n -> "Some " ^ (Col_index.to_string n) 
+            | Some n -> "Some " ^ (Col.to_string n) 
           in
           equal_to string_of_col_option
         in
 
-        let any_row = Row_index.Row1 in
+        let any_row = Row.Row1 in
         let dropped_in_col = ref None in
         let module TestGame = Game.Make (struct include Board
           let drop _ c board =
@@ -210,17 +210,17 @@ let _ =
         end) 
         in
 
-        let players = Player.create_pair (drop_in Col_index.Col3, drop_in Col_index.Col1) in
+        let players = Player.create_pair (drop_in Col.Col3, drop_in Col.Col1) in
 
         TestGame.create players |> TestGame.play_turn |> ignore;
 
-        !dropped_in_col =~ is (equal_to_col_option (Some Col_index.Col3))
+        !dropped_in_col =~ is (equal_to_col_option (Some Col.Col3))
       end;
       it "calls drop handler" begin
         let drop_handled = ref false in
-        let handler = function (Row_index.Row1, Col_index.Col4,Piece.A) -> drop_handled := true | _ -> () in
+        let handler = function (Row.Row1, Col.Col4,Piece.A) -> drop_handled := true | _ -> () in
 
-        Player.create_pair (drop_in Col_index.Col4, drop_in Col_index.Col3) |> TestGame.create |> TestGame.on_drop handler |> 
+        Player.create_pair (drop_in Col.Col4, drop_in Col.Col3) |> TestGame.create |> TestGame.on_drop handler |> 
         TestGame.play_turn |> ignore;
 
         !drop_handled =~ is true'
@@ -229,7 +229,7 @@ let _ =
         let switch_handled = ref false in
         let handler = function Piece.B -> switch_handled := true | _ -> () in
 
-        Player.create_pair (drop_in Col_index.Col2, drop_in Col_index.Col3) |> TestGame.create |> TestGame.on_switch handler |> 
+        Player.create_pair (drop_in Col.Col2, drop_in Col.Col3) |> TestGame.create |> TestGame.on_switch handler |> 
         TestGame.play_turn |> ignore;
 
         !switch_handled =~ is true'
@@ -238,7 +238,7 @@ let _ =
         let win_handled = ref false in
         let handler = function Piece.A -> win_handled := true | _ -> () in
         let play_turn = TestGame.play_turn in
-        let game = Player.create_pair (drop_in Col_index.Col2, drop_in Col_index.Col3) |> TestGame.create |> TestGame.on_win handler |>
+        let game = Player.create_pair (drop_in Col.Col2, drop_in Col.Col3) |> TestGame.create |> TestGame.on_win handler |>
                                       play_turn |> play_turn |>
                                       play_turn |> play_turn |>
                                       play_turn |> play_turn in
@@ -250,7 +250,7 @@ let _ =
       it "toggles current piece" begin
         let history = ref [] in
         let handler a = history := (a :: !history) in
-        Player.create_pair (drop_in Col_index.Col4, drop_in Col_index.Col3) |> TestGame.create |> TestGame.on_switch handler |>
+        Player.create_pair (drop_in Col.Col4, drop_in Col.Col3) |> TestGame.create |> TestGame.on_switch handler |>
 
         TestGame.play_turn |> TestGame.play_turn |> TestGame.play_turn |> ignore;
 
@@ -329,7 +329,7 @@ let _ =
         end;
         describe ".choose_column" [
           it "returns the move with the highest score" begin
-            let equal_to_col = equal_to Col_index.to_string in
+            let equal_to_col = equal_to Col.to_string in
 
             let module Board = struct include Board
               let evaluate _ board =
@@ -339,7 +339,7 @@ let _ =
             end in
             let module TestAI = Ai.Make (Board) in
 
-            TestAI.choose_column 0 Board.empty Piece.A =~ is (equal_to_col Col_index.Col4)
+            TestAI.choose_column 0 Board.empty Piece.A =~ is (equal_to_col Col.Col4)
           end;
         ];
       ];

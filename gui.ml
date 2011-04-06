@@ -4,7 +4,7 @@ module GuiGame = Game.Make(Board)
 open Tk
 
 let _ =
-  let chosen_col = ref Col_index.Col5 in
+  let chosen_col = ref Col.Col5 in
   let use_chosen_col _ _ = !chosen_col in
   let game = ref (Player.create_pair (use_chosen_col,use_chosen_col) |> GuiGame.create) in
 
@@ -16,7 +16,7 @@ let _ =
   let button_row =
     let button col =
       let drop_command _ = 
-        chosen_col := col |> Col_index.of_int;
+        chosen_col := col |> Col.of_int;
         game := GuiGame.play_turn !game in
       Button.create ~text:"v" ~command:drop_command widget in
     map button (0 -- 6) |> List.of_enum in
@@ -30,7 +30,7 @@ let _ =
 
   let drop_handler (row, col, piece) =
     let piece = Label.create ~text:"    " ~background:(colour piece) widget in
-    grid ~row:(6-(Row_index.to_int row)) ~column:(Col_index.to_int col) [piece] in
+    grid ~row:(6-(Row.to_int row)) ~column:(Col.to_int col) [piece] in
 
   let switch_handler player =
     List.iter (fun button -> Button.configure button ~highlightbackground:(colour player)) button_row in

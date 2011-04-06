@@ -3,7 +3,7 @@ open Batteries
 
 type t = Board of Lines.t * Piece.t Columns.t
 
-exception Column_full of Col_index.t
+exception Column_full of Col.t
 
 let empty = Board (Lines.empty, Columns.empty)
 
@@ -35,14 +35,12 @@ let of_string str =
     |> List.map (String.to_list |- List.map cell_of_char |- Array.of_list)
     |> Array.of_list
   in
-  let module Rows = Row_index in
-  let module Cols = Col_index in
-  Cols.left_to_right |> List.map Cols.to_int |>
+  Col.left_to_right |> List.map Col.to_int |>
     List.fold_left (fun board col ->
-      Rows.bottom_to_top |> List.map Rows.to_int |> List.fold_left (fun board row ->
+      Row.bottom_to_top |> List.map Row.to_int |> List.fold_left (fun board row ->
         match cells.(row).(col) with 
         | None -> board
-        | Some piece -> board |> drop piece (Cols.of_int col) |> fst
+        | Some piece -> board |> drop piece (Col.of_int col) |> fst
       ) board
     ) empty 
 

@@ -1,6 +1,6 @@
 open Batteries
 
-type cell = Row_index.t * Col_index.t
+type cell = Row.t * Col.t
 
 type t = { 
   a_lines : cell Line.t list;
@@ -9,8 +9,8 @@ type t = {
 } 
 
 let all_winning_lines = 
-  let open Row_index in 
-  let open Col_index in 
+  let open Row in 
+  let open Col in 
   let line = Line.create in
   [
   (* vertical *)

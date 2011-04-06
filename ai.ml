@@ -2,9 +2,9 @@ open Batteries
 
 module Make (Board : sig
   type t = Board.t
-  exception Column_full of Col_index.t
+  exception Column_full of Col.t
   val has_won : Piece.t -> t -> bool
-  val drop : Piece.t -> Col_index.t -> t -> (t * Row_index.t)
+  val drop : Piece.t -> Col.t -> t -> (t * Row.t)
   val evaluate : Piece.t -> t -> float
 end) = struct
 
@@ -31,7 +31,7 @@ end) = struct
               else
                 best_child_score (best_of best_so_far this_child_score) rest
         in
-        best_child_score fail Col_index.left_to_right
+        best_child_score fail Col.left_to_right
 
   and child_score depth board mover current_player limit_score column =
     try
@@ -47,7 +47,7 @@ end) = struct
         if value >= max then (index,value) else (maxi,max)) (-1, column_full_score)
       |- fst
     in
-    Col_index.left_to_right |> List.enum
+    Col.left_to_right |> List.enum
     |> map (child_score depth board mover mover column_full_score)
-    |> max_index |> Col_index.of_int
+    |> max_index |> Col.of_int
 end

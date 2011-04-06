@@ -2,7 +2,7 @@ open Batteries
 
 exception Column_full
 
-type 'a col = Col of ('a option * 'a option * 'a option * 'a option * 'a option * 'a option) 
+type 'a col = Column of ('a option * 'a option * 'a option * 'a option * 'a option * 'a option) 
 
 
 type 'a t = {
@@ -16,25 +16,25 @@ type 'a t = {
 }
 
 let column_indices = 
-  let open Col_index in
+  let open Col in
   [Col1; Col2; Col3; Col4; Col5; Col6; Col7]
 
 let row_indices =
-  let open Row_index in
+  let open Row in
   [Row1;Row2;Row3;Row4;Row5;Row6]
 
 let empty = {
-  first = Col (None, None, None, None, None, None);
-  second = Col (None, None, None, None, None, None);
-  third = Col (None, None, None, None, None, None);
-  fourth = Col (None, None, None, None, None, None);
-  fifth = Col (None, None, None, None, None, None);
-  sixth = Col (None, None, None, None, None, None);
-  seventh = Col (None, None, None, None, None, None)
+  first = Column (None, None, None, None, None, None);
+  second = Column (None, None, None, None, None, None);
+  third = Column (None, None, None, None, None, None);
+  fourth = Column (None, None, None, None, None, None);
+  fifth = Column (None, None, None, None, None, None);
+  sixth = Column (None, None, None, None, None, None);
+  seventh = Column (None, None, None, None, None, None)
 }
 
 let get_col col_index cols = 
-  let open Col_index in
+  let open Col in
   match col_index with
   | Col1 -> cols.first
   | Col2 -> cols.second
@@ -45,7 +45,7 @@ let get_col col_index cols =
   | Col7 -> cols.seventh
 
 let set_col col_index col cols =
-  let open Col_index in
+  let open Col in
   match col_index with
   | Col1 -> { cols with first = col }
   | Col2 -> { cols with second = col }
@@ -56,8 +56,8 @@ let set_col col_index col cols =
   | Col7 -> { cols with seventh = col }
 
 let get_cell cols row_index col_index =
-  let (Col (r1,r2,r3,r4,r5,r6)) = get_col col_index cols in
-  let open Row_index in
+  let (Column (r1,r2,r3,r4,r5,r6)) = get_col col_index cols in
+  let open Row in
   match row_index with
   | Row1 -> r1
   | Row2 -> r2
@@ -67,29 +67,29 @@ let get_cell cols row_index col_index =
   | Row6 -> r6
 
 let set_cell cols row_index col_index cell =
-  let (Col (r1,r2,r3,r4,r5,r6)) = get_col col_index cols in
-  let open Row_index in
+  let (Column (r1,r2,r3,r4,r5,r6)) = get_col col_index cols in
+  let open Row in
   let col = 
     match row_index with
-    | Row1 -> Col (cell, r2, r3, r4, r5, r6)
-    | Row2 -> Col (r1, cell, r3, r4, r5, r6)
-    | Row3 -> Col (r1, r2, cell, r4, r5, r6)
-    | Row4 -> Col (r1, r2, r3, cell, r5, r6)
-    | Row5 -> Col (r1, r2, r3, r4, cell, r6)
-    | Row6 -> Col (r1, r2, r3, r4, r5, cell)
+    | Row1 -> Column (cell, r2, r3, r4, r5, r6)
+    | Row2 -> Column (r1, cell, r3, r4, r5, r6)
+    | Row3 -> Column (r1, r2, cell, r4, r5, r6)
+    | Row4 -> Column (r1, r2, r3, cell, r5, r6)
+    | Row5 -> Column (r1, r2, r3, r4, cell, r6)
+    | Row6 -> Column (r1, r2, r3, r4, r5, cell)
   in
   set_col col_index col cols
 
 let append_to piece col = 
-  let open Row_index in
+  let open Row in
   match col with
-  | Col (None, r2, r3, r4, r5, r6) -> (Col (Some piece, r2, r3, r4, r5, r6), Row1)
-  | Col (r1, None, r3, r4, r5, r6) -> (Col (r1, Some piece, r3, r4, r5, r6), Row2)
-  | Col (r1, r2, None, r4, r5, r6) -> (Col (r1, r2, Some piece, r4, r5, r6), Row3)
-  | Col (r1, r2, r3, None, r5, r6) -> (Col (r1, r2, r3, Some piece, r5, r6), Row4)
-  | Col (r1, r2, r3, r4, None, r6) -> (Col (r1, r2, r3, r4, Some piece, r6), Row5)
-  | Col (r1, r2, r3, r4, r5, None) -> (Col (r1, r2, r3, r4, r5, Some piece), Row6)
-  | Col (Some _, Some _, Some _, Some _, Some _, Some _) -> raise Column_full
+  | Column (None, r2, r3, r4, r5, r6) -> (Column (Some piece, r2, r3, r4, r5, r6), Row1)
+  | Column (r1, None, r3, r4, r5, r6) -> (Column (r1, Some piece, r3, r4, r5, r6), Row2)
+  | Column (r1, r2, None, r4, r5, r6) -> (Column (r1, r2, Some piece, r4, r5, r6), Row3)
+  | Column (r1, r2, r3, None, r5, r6) -> (Column (r1, r2, r3, Some piece, r5, r6), Row4)
+  | Column (r1, r2, r3, r4, None, r6) -> (Column (r1, r2, r3, r4, Some piece, r6), Row5)
+  | Column (r1, r2, r3, r4, r5, None) -> (Column (r1, r2, r3, r4, r5, Some piece), Row6)
+  | Column (Some _, Some _, Some _, Some _, Some _, Some _) -> raise Column_full
 
 let append col_index piece cols =
   let (appended, row_index) = cols |> get_col col_index |> append_to piece in

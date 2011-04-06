@@ -9,7 +9,7 @@ val empty : 'a t
  * Returns the new columns and the row that the piece landed in
  * or raises Column_full if the column is full
  *)
-val append : Col_index.t -> 'a -> 'a t -> ('a t * Row_index.t)
+val append : Col.t -> 'a -> 'a t -> ('a t * Row.t)
 
 (** 
  * @param piece_to_string
