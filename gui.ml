@@ -30,7 +30,7 @@ let _ =
 
   let drop_handler (row, col, piece) =
     let piece = Label.create ~text:"    " ~background:(colour piece) widget in
-    grid ~row:(7-(Row_index.to_int row)) ~column:(Col_index.to_int col) [piece] in
+    grid ~row:(6-(Row_index.to_int row)) ~column:(Col_index.to_int col) [piece] in
 
   let switch_handler player =
     List.iter (fun button -> Button.configure button ~highlightbackground:(colour player)) button_row in
