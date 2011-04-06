@@ -1,4 +1,4 @@
-type t = { piece : Piece.t; move : (Board.t -> Piece.t -> int) }
+type t = { piece : Piece.t; move : (Board.t -> Piece.t -> Col_index.t) }
 
 let create_pair (strategy1, strategy2) =
   ({piece = Piece.A; move = strategy1}, {piece = Piece.B; move = strategy2})

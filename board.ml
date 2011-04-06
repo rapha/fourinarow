@@ -1,79 +1,49 @@
 open Batteries
 
-type t = Board of Piece.t option list list
-exception Column_full of int
 
-(* some handy functions on List *)
+type t = Board of Lines.t * Piece.t Columns.t
 
-let rotate_left n xs =
-  List.drop n xs @ List.take n xs
+exception Column_full of Col_index.t
 
-let rotate_right n =
-  List.rev |- rotate_left n |- List.rev
+let empty = Board (Lines.empty, Columns.empty)
 
-let trim predicate =
-  List.dropwhile predicate |- List.rev |- List.dropwhile predicate |- List.rev
+let columns (Board (_, cols)) = cols
+let lines (Board (lines, _)) = lines
 
-let transpose len matrix =
-  let cross_section i = matrix |> List.map (fun vector -> try List.nth vector i with Invalid_argument _ -> None) in
-  List.map cross_section (List.init len identity)
+let drop piece col board =
+  try
+    let (cols, row) = board |> columns |> Columns.append col piece in
+    let lins = board |> lines |> Lines.add piece (row, col) in
+    (Board (lins, cols), row)
+  with Columns.Column_full ->
+    raise (Column_full col)
 
-let contains sub_list full_list =
-  full_list |> 
-  List.fold_left (fun still_to_find element ->
-    match still_to_find with
-    | [] -> []
-    | first::rest when first = element -> rest
-    | _  -> sub_list
-  ) sub_list |> 
-  List.is_empty
-
-(* private *)
-
-let row_length, col_length = 7, 6
-
-let columns (Board cols) = cols
-let rows = columns |- transpose col_length
-
-let tilt_left, tilt_right =
-  let padding = (List.make (col_length-1) None) in
-  let tilter pad rotate = List.map pad |- List.mapi rotate in
-  (tilter (flip (@) padding) rotate_right, tilter ((@) padding) rotate_left)
-
-let diagonals tilt =
-  rows |- List.rev |- tilt |- transpose (col_length + row_length) |- List.map (trim ((=) None))
-
-let north_east, north_west = (diagonals tilt_left, diagonals tilt_right)
-
-(* public *)
-
-let empty = Board (List.make row_length [])
-
-let drop player col board =
-  let cols = columns board in
-  let column = List.nth cols col in
-  if (List.length column >= col_length) then raise (Column_full col) else
-  let new_column = column @ [Some player] and
-      before = (List.take col cols) and
-      after  = (List.drop (col+1) cols)
-  in Board (before @ [new_column] @ after)
-
-let has_won player board =
-  let four_in_a_row = List.make 4 (Some player) in
-  let wins_along axis = List.exists (contains four_in_a_row) (axis board) in
-  wins_along columns || wins_along rows || wins_along north_east || wins_along north_west
-
-let top_row col board =
-  List.nth (columns board) col |> List.filter Option.is_some |> List.length
+let has_won piece =
+  lines |- Lines.has_won piece
 
 let to_string =
-  let cell_to_string = function Some p -> Piece.to_string p | None -> "-" in
-  let row_to_string = List.map cell_to_string |- String.join " " |- flip (^) "\n" in
-  rows |- List.rev |- List.map row_to_string |- List.reduce (^)
+  columns |- Columns.to_string Piece.to_string
 
-let build rows =
-  let try_parse_piece s = try Some (Piece.of_string s) with _ -> None in
-  let cols = rows |> List.map (Str.split (Str.regexp "") |- List.map try_parse_piece) |> transpose row_length in
-  Board cols
+let of_string str =
+  let cell_of_char = function
+    | '-' -> None
+    | ch -> Some (Piece.of_string (String.of_char ch))
+  in
+  let cells = str 
+    |> flip String.nsplit "\n"
+    |> List.rev |> List.tl
+    |> List.map (String.to_list |- List.map cell_of_char |- Array.of_list)
+    |> Array.of_list
+  in
+  let module Rows = Row_index in
+  let module Cols = Col_index in
+  Cols.left_to_right |> List.map Cols.to_int |>
+    List.fold_left (fun board col ->
+      Rows.bottom_to_top |> List.map Rows.to_int |> List.fold_left (fun board row ->
+        match cells.(row).(col) with 
+        | None -> board
+        | Some piece -> board |> drop piece (Cols.of_int col) |> fst
+      ) board
+    ) empty 
 
 let evaluate _ _ = 0.

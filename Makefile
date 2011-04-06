@@ -3,11 +3,11 @@ all: spec
 clean:
 	rm *.cm* *.byte *.a *.o *.exe
 
-game.cma: piece.ml column.mli column.ml board.mli board.ml player.ml ai.ml game.ml
-	$(OCAMLC) -a -package batteries piece.ml column.mli column.ml board.mli board.ml player.ml ai.ml game.ml -o game.cma
+game.cma: piece.ml row_index.ml col_index.ml columns.mli columns.ml line.mli line.ml lines.ml board.mli board.ml player.ml ai.ml game.ml
+	$(OCAMLC) -a -package batteries piece.ml row_index.ml col_index.ml columns.mli columns.ml line.mli line.ml lines.ml board.mli board.ml player.ml ai.ml game.ml -o game.cma
 
-game.cmxa: piece.ml column.mli column.ml board.mli board.ml player.ml ai.ml game.ml
-	$(OCAMLOPT) -a -package batteries piece.ml column.mli column.ml board.mli board.ml player.ml ai.ml game.ml -o game.cmxa
+game.cmxa: piece.ml row_index.ml col_index.ml columns.mli columns.ml line.mli line.ml lines.ml board.mli board.ml player.ml ai.ml game.ml
+	$(OCAMLOPT) -a -package batteries piece.ml row_index.ml col_index.ml columns.mli columns.ml line.mli line.ml lines.ml board.mli board.ml player.ml ai.ml game.ml -o game.cmxa
 
 spec.byte: game.cma spec.ml
 	$(OCAMLC) -thread -package batteries,ospecl -linkpkg game.cma spec.ml -o spec.byte

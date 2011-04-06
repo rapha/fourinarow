@@ -12,151 +12,215 @@ let _ =
   let (|>) x f = f x in
 
   Ospecl.Run.console [
-    describe "Piece.to_string and Piece.of_string are inverse" begin
-      let open Piece in [
+    describe "Piece.to_string and Piece.of_string are inverse" [
         it "piece -> string -> piece" begin
-          let equal_to_piece = equal_to to_string in
+          let equal_to_piece = equal_to Piece.to_string in
 
-          A |> to_string |> of_string =~ is (equal_to_piece A)
+          Piece.A |> Piece.to_string |> Piece.of_string =~ is (equal_to_piece Piece.A)
         end;
         it "string -> piece -> string" begin
-          "A" |> of_string |> to_string =~ is (equal_to_string "A")
+          "A" |> Piece.of_string |> Piece.to_string =~ is (equal_to_string "A")
         end;
-    ] end;
+    ];
     describe "Board" begin 
-      let open Board in [
+      let open Col_index in 
+      let equal_to_board = equal_to Board.to_string in
+      [
       describe ".drop" [
-        describe "in an empty column" [
+        describe "in an Board.empty column" [
           it "puts a piece on the first row of that column" begin
-            let expected = build ["A------"] |> to_string in
-
-            empty |> drop Piece.A 0 |> to_string =~ is (equal_to_string expected)
+            let expected = Board.of_string (
+              "-------\n" ^
+              "-------\n" ^
+              "-------\n" ^
+              "-------\n" ^
+              "-------\n" ^
+              "A------\n" 
+            ) 
+            in
+            Board.empty |> Board.drop Piece.A Col1 |> fst =~ is (equal_to_board expected)
           end;
         ];
         describe "in a full column" [
           it "raises Column_full" begin
-            let board = build [
-              "B------";
-              "A------";
-              "B------";
-              "A------";
-              "B------";
-              "A------";
-            ] in
-
-            (fun () -> board |> drop Piece.A 0) =~ does (raise_exn (Column_full 0))
+            let board = Board.of_string (
+              "B------\n" ^
+              "A------\n" ^
+              "B------\n" ^
+              "A------\n" ^
+              "B------\n" ^
+              "A------\n" 
+            ) 
+            in
+            (fun () -> board |> Board.drop Piece.A Col1) =~ does (raise_exn (Board.Column_full Col1))
           end;
         ];
       ];
 
       describe ".has_won" [
-        describe "on an empty board" [
+        describe "on an Board.empty board" [
           it "is false for both players" begin
-            empty |> has_won Piece.A =~ is false';
-            empty |> has_won Piece.B =~ is false'
+            ignore (Board.empty |> Board.has_won Piece.A =~ is false');
+            Board.empty |> Board.has_won Piece.B =~ is false'
           end
         ];
         it "is false for vertical line of 3" begin
-          let board = build [
-            "A------";
-            "A------";
-            "A------"]
-          in board |> has_won Piece.A =~ is false'
+          let board = Board.of_string (
+            "-------\n" ^
+            "-------\n" ^
+            "-------\n" ^
+            "A------\n" ^
+            "A------\n" ^
+            "A------\n")
+          in 
+          board |> Board.has_won Piece.A =~ is false'
         end;
         it "is true for vertical line of 4" begin
-          let board = build [
-            "A------";
-            "A------";
-            "A------";
-            "A------"]
-          in board |> has_won Piece.A =~ is true'
+          let board = Board.of_string (
+            "-------\n" ^
+            "-------\n" ^
+            "A------\n" ^
+            "A------\n" ^
+            "A------\n" ^
+            "A------\n")
+          in 
+          board |> Board.has_won Piece.A =~ is true'
         end;
         it "is false for horizontal line of 3" begin
-          let board = build [
-            "AAA----"]
-          in board |> has_won Piece.A =~ is false'
+          let board = Board.of_string (
+            "-------\n" ^
+            "-------\n" ^
+            "-------\n" ^
+            "-------\n" ^
+            "-------\n" ^
+            "AAA----\n")
+          in 
+          board |> Board.has_won Piece.A =~ is false'
         end;
         it "is true for horizontal line of 4" begin
-          let board = build [
-            "AAAA---"]
-          in board |> has_won Piece.A =~ is true'
+          let board = Board.of_string (
+            "-------\n" ^
+            "-------\n" ^
+            "-------\n" ^
+            "-------\n" ^
+            "-------\n" ^
+            "AAAA---\n")
+          in 
+          board |> Board.has_won Piece.A =~ is true'
         end;
         it "is false for NE line of 3" begin
-          let board = build [
-            "--A----";
-            "-AB----";
-            "ABB----"]
-          in board |> has_won Piece.A =~ is false'
+          let board = Board.of_string (
+            "-------\n" ^
+            "-------\n" ^
+            "-------\n" ^
+            "--A----\n" ^
+            "-AB----\n" ^
+            "ABB----\n")
+          in 
+          board |> Board.has_won Piece.A =~ is false'
         end;
         it "is true for NE line of 4" begin
-          let board = build [
-            "---A---";
-            "--AB---";
-            "-ABB---";
-            "ABBB---"]
-          in board |> has_won Piece.A =~ is true'
+          let board = Board.of_string (
+            "-------\n" ^
+            "-------\n" ^
+            "---A---\n" ^
+            "--AB---\n" ^
+            "-ABB---\n" ^
+            "ABBB---\n")
+          in 
+          board |> Board.has_won Piece.A =~ is true'
         end;
         it "is false for NW line of 3" begin
-          let board = build [
-            "A------";
-            "BA-----";
-            "BBA----"]
-          in board |> has_won Piece.A =~ is false'
+          let board = Board.of_string (
+            "-------\n" ^
+            "-------\n" ^
+            "-------\n" ^
+            "A------\n" ^
+            "BA-----\n" ^
+            "BBA----\n")
+          in 
+          board |> Board.has_won Piece.A =~ is false'
         end;
         it "is true for NW line of 4" begin
-          let board = build [
-            "A------";
-            "BA-----";
-            "BBA----";
-            "BBBA---"]
-          in board |> has_won Piece.A =~ is true'
+          let board = Board.of_string (
+            "-------\n" ^
+            "-------\n" ^
+            "A------\n" ^
+            "BA-----\n" ^
+            "BBA----\n" ^
+            "BBBA---\n")
+          in 
+          board |> Board.has_won Piece.A =~ is true'
         end;
         it "is false when there is a gap in the line" begin
-          let board = build [
-            "----B--";
-            "---BB--";
-            "--BAA--";
-            "--AAA--";
-            "B-AAA--"]
-          in board |> has_won Piece.B =~ is false'
+          let board = Board.of_string (
+            "-------\n" ^
+            "----B--\n" ^
+            "---BB--\n" ^
+            "--BAA--\n" ^
+            "--AAA--\n" ^
+            "B-AAA--\n")
+          in 
+          board |> Board.has_won Piece.B =~ is false'
         end;
       ];
       describe ".to_string" [
         it "for empty board is 6 row by 7 cols of -" begin
           let expected = (
-            "- - - - - - -\n" ^
-            "- - - - - - -\n" ^
-            "- - - - - - -\n" ^
-            "- - - - - - -\n" ^
-            "- - - - - - -\n" ^
-            "- - - - - - -\n" )
-          in empty |> to_string =~ is (equal_to_string expected)
+            "-------\n" ^
+            "-------\n" ^
+            "-------\n" ^
+            "-------\n" ^
+            "-------\n" ^
+            "-------\n" )
+          in 
+          Board.empty |> Board.to_string =~ is (equal_to_string expected)
+        end;
+        it "for with a single piece dropped in leftmost column shows piece at
+        bottom left" begin
+          let expected = (
+            "-------\n" ^
+            "-------\n" ^
+            "-------\n" ^
+            "-------\n" ^
+            "-------\n" ^
+            "A------\n" )
+          in 
+          Board.empty |> Board.drop Piece.A Col1 |> fst |> Board.to_string =~ is (equal_to_string expected)
         end;
       ];
     ] end;
 
     describe "Game.play_turn" [
       it "uses function passed in to get row to drop in" begin
-        let col = ref None in
+        let equal_to_col_option = 
+          let string_of_col_option = function 
+            | None -> "None" 
+            | Some n -> "Some " ^ (Col_index.to_string n) 
+          in
+          equal_to string_of_col_option
+        in
+
+        let any_row = Row_index.Row1 in
+        let dropped_in_col = ref None in
         let module TestGame = Game.Make (struct include Board
           let drop _ c board =
-            col := Some c;
-            board
-        end) in
+            dropped_in_col := Some c;
+            (board, any_row)
+        end) 
+        in
 
-        let players = Player.create_pair (drop_in 3, drop_in 0) in
+        let players = Player.create_pair (drop_in Col_index.Col3, drop_in Col_index.Col1) in
 
         TestGame.create players |> TestGame.play_turn |> ignore;
 
-        let equal_to_int_option = equal_to (function None -> "None" | Some n -> "Some " ^ (string_of_int n)) in
-
-        !col =~ is (equal_to_int_option (Some 3))
+        !dropped_in_col =~ is (equal_to_col_option (Some Col_index.Col3))
       end;
       it "calls drop handler" begin
         let drop_handled = ref false in
-        let handler = function (1,3,Piece.A) -> drop_handled := true | _ -> () in
+        let handler = function (Row_index.Row1, Col_index.Col4,Piece.A) -> drop_handled := true | _ -> () in
 
-        Player.create_pair (drop_in 3, drop_in 2) |> TestGame.create |> TestGame.on_drop handler |> 
+        Player.create_pair (drop_in Col_index.Col4, drop_in Col_index.Col3) |> TestGame.create |> TestGame.on_drop handler |> 
         TestGame.play_turn |> ignore;
 
         !drop_handled =~ is true'
@@ -165,7 +229,7 @@ let _ =
         let switch_handled = ref false in
         let handler = function Piece.B -> switch_handled := true | _ -> () in
 
-        Player.create_pair (drop_in 1, drop_in 2) |> TestGame.create |> TestGame.on_switch handler |> 
+        Player.create_pair (drop_in Col_index.Col2, drop_in Col_index.Col3) |> TestGame.create |> TestGame.on_switch handler |> 
         TestGame.play_turn |> ignore;
 
         !switch_handled =~ is true'
@@ -174,7 +238,7 @@ let _ =
         let win_handled = ref false in
         let handler = function Piece.A -> win_handled := true | _ -> () in
         let play_turn = TestGame.play_turn in
-        let game = Player.create_pair (drop_in 1, drop_in 2) |> TestGame.create |> TestGame.on_win handler |>
+        let game = Player.create_pair (drop_in Col_index.Col2, drop_in Col_index.Col3) |> TestGame.create |> TestGame.on_win handler |>
                                       play_turn |> play_turn |>
                                       play_turn |> play_turn |>
                                       play_turn |> play_turn in
@@ -186,7 +250,7 @@ let _ =
       it "toggles current piece" begin
         let history = ref [] in
         let handler a = history := (a :: !history) in
-        Player.create_pair (drop_in 3, drop_in 2) |> TestGame.create |> TestGame.on_switch handler |>
+        Player.create_pair (drop_in Col_index.Col4, drop_in Col_index.Col3) |> TestGame.create |> TestGame.on_switch handler |>
 
         TestGame.play_turn |> TestGame.play_turn |> TestGame.play_turn |> ignore;
 
@@ -200,7 +264,7 @@ let _ =
       describe ".minimax" begin
         let equal_to_float = within 0.0001 in [
           
-          it "returns 0 if empty" begin
+          it "returns 0 if Board.empty" begin
             let module TestAI = Ai.Make(Board) in
 
             Board.empty |> TestAI.minimax 0 Piece.A Piece.A TestAI.winning_score =~ is (equal_to_float 0.)
@@ -232,7 +296,7 @@ let _ =
             let module TestAI = Ai.Make (struct include Board
               let evaluate player board =
                 match board |> to_string |> lines |> List.last with
-                | "- A - - - - -" ->  5.
+                | "-A-----" ->  5.
                 | _         ->  0.
             end) in
 
@@ -243,8 +307,10 @@ let _ =
               let evaluate player board =
                 let bottom_row = board |> to_string |> lines |> List.last in
                 let col_with piece = 
-                  try Str.search_forward (Str.regexp (piece |> Piece.to_string)) bottom_row 0 |> flip (lsr) 1 |> (+) 1
-                  with Not_found -> 0
+                  try 
+                    String.find bottom_row (piece |> Piece.to_string) |> (+) 1
+                  with Not_found -> 
+                    0
                 in
                 (col_with Piece.A) + (col_with Piece.B) |> ( * ) (-1) |> float_of_int
             end) in
@@ -263,15 +329,17 @@ let _ =
         end;
         describe ".choose_column" [
           it "returns the move with the highest score" begin
+            let equal_to_col = equal_to Col_index.to_string in
+
             let module Board = struct include Board
               let evaluate _ board =
                 match board |> to_string |> lines |> List.last with
-                | "- - - A - - -" -> 1.
+                | "---A---" -> 1.
                 | _         -> 0.
             end in
             let module TestAI = Ai.Make (Board) in
 
-            TestAI.choose_column 0 Board.empty Piece.A =~ is (equal_to_int 3)
+            TestAI.choose_column 0 Board.empty Piece.A =~ is (equal_to_col Col_index.Col4)
           end;
         ];
       ];
