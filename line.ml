@@ -1,39 +1,35 @@
-type 'a point = Filled of 'a | Empty of 'a
+type 'a spot = ('a * bool) (* (cell, filled) *)
 
 exception Line_full
 
-type 'a t = {first: 'a point; second: 'a point; third: 'a point; fourth: 'a point}
+type 'a t = {first: 'a spot; second: 'a spot; third: 'a spot; fourth: 'a spot}
 
 let create cell_a cell_b cell_c cell_d = {
-  first = Empty cell_a;
-  second = Empty cell_b;
-  third = Empty cell_c;
-  fourth = Empty cell_d;
+  first = (cell_a, false);
+  second = (cell_b, false);
+  third = (cell_c, false);
+  fourth = (cell_d, false);
 }
 
 let fill cell line =
   match line with
-  | {first = Empty c} when c = cell -> { line with first = Filled c }
-  | {second = Empty c} when c = cell -> { line with second = Filled c }
-  | {third = Empty c} when c = cell -> { line with third = Filled c }
-  | {fourth = Empty c} when c = cell -> { line with fourth = Filled c }
+  | {first = (c, false)} when c = cell -> { line with first = (c, true) }
+  | {second = (c, false)} when c = cell -> { line with second = (c, true) }
+  | {third = (c, false)} when c = cell -> { line with third = (c, true) }
+  | {fourth = (c, false)} when c = cell -> { line with fourth = (c, true) }
   | _ -> line
 
 let is_full = function
-  | {first = Filled _; second = Filled _; third = Filled _; fourth = Filled _} -> 
+  | {first = (_, true); second = (_, true); third = (_, true); fourth = (_, true)} -> 
       true
   | _ -> 
       false
 
 let includes cell line =
   match line with
-  | {first = Empty c} when c = cell -> true
-  | {first = Filled c} when c = cell -> true
-  | {second = Empty c} when c = cell -> true
-  | {second = Filled c} when c = cell -> true
-  | {third = Empty c} when c = cell -> true
-  | {third = Filled c} when c = cell -> true
-  | {fourth = Empty c} when c = cell -> true
-  | {fourth = Filled c} when c = cell -> true
+  | {first = (c, _)} when c = cell -> true
+  | {second = (c, _)} when c = cell -> true
+  | {third = (c, _)} when c = cell -> true
+  | {fourth = (c, _)} when c = cell -> true
   | _ ->
       false
