@@ -3,8 +3,8 @@ open Batteries
 type cell = Row.t * Col.t
 
 type t = { 
-  a_lines : cell Line.t list;
-  b_lines : cell Line.t list;
+  yellow_lines : cell Line.t list;
+  red_lines : cell Line.t list;
   free_lines : cell Line.t list;
 } 
 
@@ -41,23 +41,23 @@ let all_winning_lines =
 ]
 
 let empty = {
-  a_lines = [];
-  b_lines = [];
+  yellow_lines = [];
+  red_lines = [];
   free_lines = all_winning_lines;
 }
 
-let lines_for piece {a_lines; b_lines} =
+let lines_for piece {yellow_lines; red_lines} =
   match piece with
-  | Piece.Yellow -> a_lines
-  | Piece.Red -> b_lines
+  | Piece.Yellow -> yellow_lines
+  | Piece.Red -> red_lines
 
-let add piece cell ({a_lines; b_lines; free_lines} as lines) =
+let add piece cell ({yellow_lines; red_lines; free_lines} as lines) =
   let (new_lines, still_free) = free_lines |> List.partition (Line.includes cell) in
   let my_lines = lines |> lines_for piece |> List.append new_lines |> List.map (Line.fill cell) in
   let their_lines = lines |> lines_for (Piece.opponent piece) |> List.filter (not -| Line.includes cell) in
   match piece with
-  | Piece.Yellow -> {a_lines = my_lines; b_lines = their_lines; free_lines = still_free}
-  | Piece.Red -> {a_lines = their_lines; b_lines = my_lines; free_lines = still_free}
+  | Piece.Yellow -> {yellow_lines = my_lines; red_lines = their_lines; free_lines = still_free}
+  | Piece.Red -> {yellow_lines = their_lines; red_lines = my_lines; free_lines = still_free}
 
 let has_won piece lines =
   lines |> lines_for piece |> List.exists Line.is_full
