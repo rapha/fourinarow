@@ -10,9 +10,3 @@ val empty : 'a t
  * or raises Full if the column is full
  *)
 val append : Col.t -> 'a -> 'a t -> ('a t * Row.t)
-(*
-(* piece_to_string -> columns -> result *)
-val to_string : ('a -> string) -> 'a t -> string
-(* piece_of_string -> columns -> result *)
-val of_string : (string -> 'a) -> string -> 'a t
-*)

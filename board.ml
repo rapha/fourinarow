@@ -1,6 +1,5 @@
 open Batteries
 
-
 type t = Board of Lines.t * Piece.t Columns.t
 
 exception Column_full of Col.t

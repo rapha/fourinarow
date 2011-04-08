@@ -43,34 +43,3 @@ let append col piece cols =
   | Col5 -> ( { cols with col5 = Some (next_row cols.col5) }, (next_row cols.col5) )
   | Col6 -> ( { cols with col6 = Some (next_row cols.col6) }, (next_row cols.col6) )
   | Col7 -> ( { cols with col7 = Some (next_row cols.col7) }, (next_row cols.col7) )
-(*
-let to_string piece_to_string cols =
-  let cell_to_string = function
-    | Some piece -> piece_to_string piece
-    | None -> "-"
-  in
-  let row_to_string row =
-    Col.left_to_right |> List.map (get_cell cols row) |> List.map cell_to_string |> String.join ""
-  in
-  Row.top_to_bottom |> List.map row_to_string |> String.join "\n" |> flip (^) "\n"
-
-let of_string piece_of_string str =
-  let cell_of_string = function
-    | "-" -> None
-    | s   -> Some (piece_of_string s)
-  in
-  let row_of_string row_str =
-    row_str
-    |> flip String.nsplit " "
-    |> List.map cell_of_string
-  in
-  let row_strings = str |> flip String.nsplit "\n" |> List.rev in
-  row_strings |> List.fold_left (fun cols row_str ->
-    let indexed_cells = row_str |> row_of_string |> List.combine Col.left_to_right in
-    indexed_cells |> List.fold_left (fun cols (col, cell) ->
-      match cell with
-      | None -> cols
-      | Some piece -> cols |> append col piece
-    ) cols
-  ) empty
-*)
