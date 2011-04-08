@@ -4,7 +4,7 @@ module Make (Board : sig
   type t = Board.t
   exception Column_full of Col.t
   val has_won : Piece.t -> t -> bool
-  val drop : Piece.t -> Col.t -> t -> (t * Row.t)
+  val drop : Piece.t -> Col.t -> t -> t
   val evaluate : Piece.t -> t -> float
 end) = struct
 
@@ -31,15 +31,14 @@ end) = struct
               else
                 best_child_score (best_of best_so_far this_child_score) rest
         in
-        best_child_score fail Col.left_to_right
+        Col.left_to_right |> best_child_score fail
 
   and child_score depth board mover current_player limit_score column =
     try
-      board |> Board.drop current_player column |> fst |> minimax (depth-1) mover (Piece.opponent current_player) limit_score
+      board |> Board.drop current_player column |> minimax (depth-1) mover (Piece.opponent current_player) limit_score
     with
       Board.Column_full _ ->
         if current_player = mover then column_full_score else (column_full_score *. -1.)
-
 
   let choose_column depth board mover =
     let max_index =

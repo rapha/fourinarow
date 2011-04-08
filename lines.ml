@@ -60,4 +60,4 @@ let add piece cell ({yellow_lines; red_lines; free_lines} as lines) =
   | Piece.Red -> {yellow_lines = their_lines; red_lines = my_lines; free_lines = still_free}
 
 let has_won piece lines =
-  lines |> lines_for piece |> List.exists Line.is_full
+  lines |> lines_for piece |> List.exists Line.all_filled

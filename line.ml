@@ -19,7 +19,7 @@ let fill cell line =
   | {fourth = (c, false)} when c = cell -> { line with fourth = (c, true) }
   | _ -> line
 
-let is_full = function
+let all_filled = function
   | {first = (_, true); second = (_, true); third = (_, true); fourth = (_, true)} -> 
       true
   | _ -> 

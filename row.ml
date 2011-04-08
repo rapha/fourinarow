@@ -20,7 +20,7 @@ let of_int = function
   | 3 -> Row4
   | 4 -> Row5
   | 5 -> Row6
-  | _ -> invalid_arg "row index must be in range [0-5]"
+  | i -> invalid_arg (Printf.sprintf "Row index of %d is invalid. Must be in range [0-5]." i)
 
 let to_string index = "Row" ^ (index |> to_int |> string_of_int)
 

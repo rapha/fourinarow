@@ -24,172 +24,148 @@ let _ =
     ];
     describe "Board" begin 
       let open Col in 
-      let equal_to_board = equal_to Board.to_string in
+      let equal_to_board = equal_to (fun _ -> "<board>") in
       [
-      describe ".drop" [
-        describe "in an Board.empty column" [
-          it "puts a piece on the first row of that column" begin
-            let expected = Board.of_string (
-              "-------\n" ^
-              "-------\n" ^
-              "-------\n" ^
-              "-------\n" ^
-              "-------\n" ^
-              "Y------\n" 
-            ) 
-            in
-            Board.empty |> Board.drop Piece.Yellow Col1 |> fst =~ is (equal_to_board expected)
-          end;
+        describe ".drop" [
+          describe "in an Board.empty column" [
+            it "puts a piece on the first row of that column" begin
+              let expected = Board.of_string (
+                "-------\n" ^
+                "-------\n" ^
+                "-------\n" ^
+                "-------\n" ^
+                "-------\n" ^
+                "Y------\n" 
+              ) 
+              in
+              Board.empty |> Board.drop Piece.Yellow Col1 =~ is (equal_to_board expected)
+            end;
+          ];
+          describe "in a full column" [
+            it "raises Column_full" begin
+              let board = Board.of_string (
+                "R------\n" ^
+                "Y------\n" ^
+                "R------\n" ^
+                "Y------\n" ^
+                "R------\n" ^
+                "Y------\n" 
+              ) 
+              in
+              (fun () -> board |> Board.drop Piece.Yellow Col1) =~ does (raise_exn (Board.Column_full Col1))
+            end;
+          ];
         ];
-        describe "in a full column" [
-          it "raises Column_full" begin
-            let board = Board.of_string (
-              "R------\n" ^
-              "Y------\n" ^
-              "R------\n" ^
-              "Y------\n" ^
-              "R------\n" ^
-              "Y------\n" 
-            ) 
-            in
-            (fun () -> board |> Board.drop Piece.Yellow Col1) =~ does (raise_exn (Board.Column_full Col1))
-          end;
-        ];
-      ];
 
-      describe ".has_won" [
-        describe "on an Board.empty board" [
-          it "is false for both players" begin
-            ignore (Board.empty |> Board.has_won Piece.Yellow =~ is false');
-            Board.empty |> Board.has_won Piece.Red =~ is false'
-          end
+        describe ".has_won" [
+          describe "on an Board.empty board" [
+            it "is false for both players" begin
+              ignore (Board.empty |> Board.has_won Piece.Yellow =~ is false');
+              Board.empty |> Board.has_won Piece.Red =~ is false'
+            end
+          ];
+          it "is false for vertical line of 3" begin
+            let board = Board.of_string (
+              "-------\n" ^
+              "-------\n" ^
+              "-------\n" ^
+              "Y------\n" ^
+              "Y------\n" ^
+              "Y------\n")
+            in 
+            board |> Board.has_won Piece.Yellow =~ is false'
+          end;
+          it "is true for vertical line of 4" begin
+            let board = Board.of_string (
+              "-------\n" ^
+              "-------\n" ^
+              "Y------\n" ^
+              "Y------\n" ^
+              "Y------\n" ^
+              "Y------\n")
+            in 
+            board |> Board.has_won Piece.Yellow =~ is true'
+          end;
+          it "is false for horizontal line of 3" begin
+            let board = Board.of_string (
+              "-------\n" ^
+              "-------\n" ^
+              "-------\n" ^
+              "-------\n" ^
+              "-------\n" ^
+              "YYY----\n")
+            in 
+            board |> Board.has_won Piece.Yellow =~ is false'
+          end;
+          it "is true for horizontal line of 4" begin
+            let board = Board.of_string (
+              "-------\n" ^
+              "-------\n" ^
+              "-------\n" ^
+              "-------\n" ^
+              "-------\n" ^
+              "YYYY---\n")
+            in 
+            board |> Board.has_won Piece.Yellow =~ is true'
+          end;
+          it "is false for NE line of 3" begin
+            let board = Board.of_string (
+              "-------\n" ^
+              "-------\n" ^
+              "-------\n" ^
+              "--Y----\n" ^
+              "-YR----\n" ^
+              "YRR----\n")
+            in 
+            board |> Board.has_won Piece.Yellow =~ is false'
+          end;
+          it "is true for NE line of 4" begin
+            let board = Board.of_string (
+              "-------\n" ^
+              "-------\n" ^
+              "---Y---\n" ^
+              "--YR---\n" ^
+              "-YRR---\n" ^
+              "YRRR---\n")
+            in 
+            board |> Board.has_won Piece.Yellow =~ is true'
+          end;
+          it "is false for NW line of 3" begin
+            let board = Board.of_string (
+              "-------\n" ^
+              "-------\n" ^
+              "-------\n" ^
+              "Y------\n" ^
+              "RY-----\n" ^
+              "RRY----\n")
+            in 
+            board |> Board.has_won Piece.Yellow =~ is false'
+          end;
+          it "is true for NW line of 4" begin
+            let board = Board.of_string (
+              "-------\n" ^
+              "-------\n" ^
+              "Y------\n" ^
+              "RY-----\n" ^
+              "RRY----\n" ^
+              "RRRY---\n")
+            in 
+            board |> Board.has_won Piece.Yellow =~ is true'
+          end;
+          it "is false when there is a gap in the line" begin
+            let board = Board.of_string (
+              "-------\n" ^
+              "----R--\n" ^
+              "---RR--\n" ^
+              "--RYY--\n" ^
+              "--YYY--\n" ^
+              "R-YYY--\n")
+            in 
+            board |> Board.has_won Piece.Red =~ is false'
+          end;
         ];
-        it "is false for vertical line of 3" begin
-          let board = Board.of_string (
-            "-------\n" ^
-            "-------\n" ^
-            "-------\n" ^
-            "Y------\n" ^
-            "Y------\n" ^
-            "Y------\n")
-          in 
-          board |> Board.has_won Piece.Yellow =~ is false'
-        end;
-        it "is true for vertical line of 4" begin
-          let board = Board.of_string (
-            "-------\n" ^
-            "-------\n" ^
-            "Y------\n" ^
-            "Y------\n" ^
-            "Y------\n" ^
-            "Y------\n")
-          in 
-          board |> Board.has_won Piece.Yellow =~ is true'
-        end;
-        it "is false for horizontal line of 3" begin
-          let board = Board.of_string (
-            "-------\n" ^
-            "-------\n" ^
-            "-------\n" ^
-            "-------\n" ^
-            "-------\n" ^
-            "YYY----\n")
-          in 
-          board |> Board.has_won Piece.Yellow =~ is false'
-        end;
-        it "is true for horizontal line of 4" begin
-          let board = Board.of_string (
-            "-------\n" ^
-            "-------\n" ^
-            "-------\n" ^
-            "-------\n" ^
-            "-------\n" ^
-            "YYYY---\n")
-          in 
-          board |> Board.has_won Piece.Yellow =~ is true'
-        end;
-        it "is false for NE line of 3" begin
-          let board = Board.of_string (
-            "-------\n" ^
-            "-------\n" ^
-            "-------\n" ^
-            "--Y----\n" ^
-            "-YR----\n" ^
-            "YRR----\n")
-          in 
-          board |> Board.has_won Piece.Yellow =~ is false'
-        end;
-        it "is true for NE line of 4" begin
-          let board = Board.of_string (
-            "-------\n" ^
-            "-------\n" ^
-            "---Y---\n" ^
-            "--YR---\n" ^
-            "-YRR---\n" ^
-            "YRRR---\n")
-          in 
-          board |> Board.has_won Piece.Yellow =~ is true'
-        end;
-        it "is false for NW line of 3" begin
-          let board = Board.of_string (
-            "-------\n" ^
-            "-------\n" ^
-            "-------\n" ^
-            "Y------\n" ^
-            "RY-----\n" ^
-            "RRY----\n")
-          in 
-          board |> Board.has_won Piece.Yellow =~ is false'
-        end;
-        it "is true for NW line of 4" begin
-          let board = Board.of_string (
-            "-------\n" ^
-            "-------\n" ^
-            "Y------\n" ^
-            "RY-----\n" ^
-            "RRY----\n" ^
-            "RRRY---\n")
-          in 
-          board |> Board.has_won Piece.Yellow =~ is true'
-        end;
-        it "is false when there is a gap in the line" begin
-          let board = Board.of_string (
-            "-------\n" ^
-            "----R--\n" ^
-            "---RR--\n" ^
-            "--RYY--\n" ^
-            "--YYY--\n" ^
-            "R-YYY--\n")
-          in 
-          board |> Board.has_won Piece.Red =~ is false'
-        end;
-      ];
-      describe ".to_string" [
-        it "for empty board is 6 row by 7 cols of -" begin
-          let expected = (
-            "-------\n" ^
-            "-------\n" ^
-            "-------\n" ^
-            "-------\n" ^
-            "-------\n" ^
-            "-------\n" )
-          in 
-          Board.empty |> Board.to_string =~ is (equal_to_string expected)
-        end;
-        it "for with a single piece dropped in leftmost column shows piece at
-        bottom left" begin
-          let expected = (
-            "-------\n" ^
-            "-------\n" ^
-            "-------\n" ^
-            "-------\n" ^
-            "-------\n" ^
-            "Y------\n" )
-          in 
-          Board.empty |> Board.drop Piece.Yellow Col1 |> fst |> Board.to_string =~ is (equal_to_string expected)
-        end;
-      ];
-    ] end;
+      ] 
+    end;
 
     describe "Game.play_turn" [
       it "uses function passed in to get row to drop in" begin
@@ -201,12 +177,11 @@ let _ =
           equal_to string_of_col_option
         in
 
-        let any_row = Row.Row1 in
         let dropped_in_col = ref None in
         let module TestGame = Game.Make (struct include Board
           let drop _ c board =
             dropped_in_col := Some c;
-            (board, any_row)
+            board
         end) 
         in
 
@@ -218,7 +193,7 @@ let _ =
       end;
       it "calls drop handler" begin
         let drop_handled = ref false in
-        let handler = function (Row.Row1, Col.Col4,Piece.Yellow) -> drop_handled := true | _ -> () in
+        let handler = function (Col.Col4, Piece.Yellow) -> drop_handled := true | _ -> () in
 
         Player.create_pair (drop_in Col.Col4, drop_in Col.Col3) |> TestGame.create |> TestGame.on_drop handler |> 
         TestGame.play_turn |> ignore;
@@ -294,26 +269,35 @@ let _ =
           end;
           it "with depth 1 returns highest values from eval function after this turn" begin
             let module TestAI = Ai.Make (struct include Board
+              let last_drop = ref None 
+              let drop _ col board = 
+                last_drop := Some col;
+                board
               let evaluate player board =
-                match board |> to_string |> lines |> List.last with
-                | "-Y-----" ->  5.
-                | _         ->  0.
+                match !last_drop with
+                | Some Col.Col2 -> 5.
+                | _             -> 0.
             end) in
 
             TestAI.minimax 1 Piece.Yellow Piece.Yellow TestAI.winning_score Board.empty =~ is (equal_to_float 5.)
           end;
           it "with depth 2 returns highest of lowest eval values after 2 turns" begin
             let module TestAI = Ai.Make (struct include Board
+              let yellow_col = ref None
+              let red_col = ref None
+
+              let drop piece col board = 
+                begin 
+                  match piece with 
+                  | Piece.Yellow -> yellow_col := Some (col |> Col.to_int |> succ)
+                  | Piece.Red -> red_col := Some (col |> Col.to_int |> succ)
+                end;
+                board
+
               let evaluate player board =
-                let bottom_row = board |> to_string |> lines |> List.last in
-                let col_with piece = 
-                  try 
-                    let piece_char = piece |> Piece.to_char |> String.of_char in
-                    String.find bottom_row piece_char |> (+) 1
-                  with Not_found -> 
-                    0
-                in
-                (col_with Piece.Yellow) + (col_with Piece.Red) |> ( * ) (-1) |> float_of_int
+                match (!yellow_col, !red_col) with
+                | (Some y, Some r) -> y + r |> ( * ) (-1) |> float_of_int
+                | _ -> failwith "should have dropped both a yellow and a red piece"
             end) in
 
             TestAI.minimax 2 Piece.Yellow Piece.Yellow TestAI.winning_score Board.empty =~ is (equal_to_float (-8.))
@@ -333,11 +317,18 @@ let _ =
             let equal_to_col = equal_to Col.to_string in
 
             let module Board = struct include Board
+              let last_drop = ref None
+
+              let drop _ col board =
+                last_drop := Some col;
+                board
+
               let evaluate _ board =
-                match board |> to_string |> lines |> List.last with
-                | "---Y---" -> 1.
-                | _         -> 0.
-            end in
+                match !last_drop with
+                | Some Col.Col4 -> 1.
+                | _ -> 0.
+            end 
+            in
             let module TestAI = Ai.Make (Board) in
 
             TestAI.choose_column 0 Board.empty Piece.Yellow =~ is (equal_to_col Col.Col4)
