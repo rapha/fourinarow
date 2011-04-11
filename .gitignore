@@ -5,3 +5,5 @@
 *.o
 *.exe
 
+.source_dependencies
+
