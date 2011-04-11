@@ -1,4 +1,4 @@
-open Batteries
+open Batteries_uni
 
 open Ospecl.Spec
 open Ospecl.Matchers
@@ -6,7 +6,6 @@ open Ospecl.Matchers
 module TestGame = Game.Make(Board)
 
 let _ =
-  let lines = Str.split (Str.regexp "\n") in
   let drop_in col _ _ = col in
 
   let (|>) x f = f x in

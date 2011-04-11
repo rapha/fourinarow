@@ -1,4 +1,4 @@
-open Batteries
+open Batteries_uni
 
 type cell = Row.t * Col.t
 

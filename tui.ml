@@ -1,4 +1,4 @@
-open Batteries
+open Batteries_uni
 open Printf
 module TuiAi = Ai.Make(Board)
 module TuiGame = Game.Make(Board)

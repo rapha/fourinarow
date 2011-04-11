@@ -1,4 +1,4 @@
-open Batteries
+open Batteries_uni
 
 type t = Board of Lines.t * Piece.t Columns.t
 

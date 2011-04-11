@@ -1,5 +1,4 @@
-
-open Batteries
+open Batteries_uni
 
 module Make (Board : sig
   type t = Board.t
