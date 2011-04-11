@@ -9,11 +9,8 @@ game.cma: piece.ml row.ml col.ml columns.mli columns.ml line.mli line.ml lines.m
 game.cmxa: piece.ml row.ml col.ml columns.mli columns.ml line.mli line.ml lines.mli lines.ml board.mli board.ml player.ml ai.ml game.ml
 	$(OCAMLOPT) -a -package batteries piece.ml row.ml col.ml columns.mli columns.ml line.mli line.ml lines.mli lines.ml board.mli board.ml player.ml ai.ml game.ml -o game.cmxa
 
-spec.byte: game.cma spec.ml
-	$(OCAMLC) -thread -package batteries,ospecl -linkpkg game.cma spec.ml -o spec.byte
-
-spec: spec.byte
-	ocamlrun -b ./spec.byte
+spec: game.cma spec.ml
+	ospecl spec.ml
 
 tui.byte: game.cma tui.ml
 	$(OCAMLC) -thread -package batteries -linkpkg game.cma tui.ml -o tui.byte

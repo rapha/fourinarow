@@ -1,16 +1,30 @@
-open Batteries_uni
+#use "topfind"
 
+#require "unix"
+#require "ospecl"
 open Ospecl.Spec
 open Ospecl.Matchers
 
+#require "batteries"
+open Batteries_uni
+
+#load "col.cmo"
+#load "row.cmo"
+#load "piece.cmo"
+#load "line.cmo"
+#load "lines.cmo"
+#load "columns.cmo"
+#load "board.cmo"
+#load "player.cmo"
+#load "game.cmo"
+#load "ai.cmo"
+
 module TestGame = Game.Make(Board)
 
-let _ =
+let specs =
   let drop_in col _ _ = col in
 
-  let (|>) x f = f x in
-
-  Ospecl.Run.console [
+  [
     describe "Piece.to_char and Piece.of_char are inverse" [
         it "piece -> char -> piece" begin
           let equal_to_piece = equal_to Piece.to_string in
