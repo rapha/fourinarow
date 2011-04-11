@@ -1,25 +1,25 @@
 all: spec
 
 clean:
-	rm -f *.cm* *.byte *.a *.o *.exe .source_dependencies
+	find -E . -regex '.*\.(cm..?|a|o|exe|byte|source_dependencies)' | xargs rm
 
-game.cma: piece.cmo row.cmo col.cmo columns.cmo line.cmo lines.cmo board.cmo player.cmo ai.cmo game.cmo
-	$(OCAMLC) -a -package batteries piece.cmo row.cmo col.cmo columns.cmo line.cmo lines.cmo board.cmo player.cmo ai.cmo game.cmo -o game.cma
+game.cma: src/piece.cmo src/row.cmo src/col.cmo src/columns.cmo src/line.cmo src/lines.cmo src/board.cmo src/player.cmo src/ai.cmo src/game.cmo
+	$(OCAMLC) -a -package batteries src/piece.cmo src/row.cmo src/col.cmo src/columns.cmo src/line.cmo src/lines.cmo src/board.cmo src/player.cmo src/ai.cmo src/game.cmo -o game.cma
 
-game.cmxa: piece.cmx row.cmx col.cmx columns.cmx line.cmx lines.cmx board.cmx player.cmx ai.cmx game.cmx
-	$(OCAMLOPT) -a -package batteries piece.cmx row.cmx col.cmx columns.cmx line.cmx lines.cmx board.cmx player.cmx ai.cmx game.cmx -o game.cmxa
+game.cmxa: src/piece.cmx src/row.cmx src/col.cmx src/columns.cmx src/line.cmx src/lines.cmx src/board.cmx src/player.cmx src/ai.cmx src/game.cmx
+	$(OCAMLOPT) -a -package batteries src/piece.cmx src/row.cmx src/col.cmx src/columns.cmx src/line.cmx src/lines.cmx src/board.cmx src/player.cmx src/ai.cmx src/game.cmx -o game.cmxa
 
-spec: game.cma spec.ml
-	ospecl spec.ml
+spec: game.cma spec/spec.ml
+	ospecl -I src spec/spec.ml
 
-tui.byte: game.cma tui.ml
-	$(OCAMLC) -thread -linkpkg game.cma tui.ml -o tui.byte
+tui.byte: game.cma src/tui.ml
+	$(OCAMLC) -thread -linkpkg game.cma src/tui.ml -o tui.byte
 
-tui.exe: game.cmxa tui.ml
-	$(OCAMLOPT) -thread -linkpkg game.cmxa tui.ml -o tui.exe
+tui.exe: game.cmxa src/tui.ml
+	$(OCAMLOPT) -thread -linkpkg game.cmxa src/tui.ml -o tui.exe
 
 gui.byte: game.cma gui.ml
-	$(OCAMLC) -thread -package labltk -linkpkg game.cma gui.ml -o gui.byte
+	$(OCAMLC) -thread -package labltk -linkpkg game.cma src/gui.ml -o gui.byte
 
 .PHONY: all clean spec
 
@@ -29,13 +29,13 @@ OCAMLOPT = ocamlfind ocamlopt -g -warn-error A -package batteries
 # simple file transforms
 .SUFFIXES: .mli .ml .cmi .cmo .cmx
 .mli.cmi:
-	$(OCAMLC) -c $<
+	$(OCAMLC) -c -I src -I spec $<
 .ml.cmo:
-	$(OCAMLC) -c $<
+	$(OCAMLC) -c -I src -I spec $<
 .ml.cmx:
-	$(OCAMLOPT) -c $<
+	$(OCAMLOPT) -c -I src -I spec $<
 
 # autogenerate source dependencies
-.source_dependencies: *.mli *.ml
-	ocamldep *.mli *.ml >.source_dependencies
+.source_dependencies: src/*.mli src/*.ml
+	ocamldep src/*.mli src/*.ml >.source_dependencies
 include .source_dependencies
