@@ -9,8 +9,8 @@ game.cma: src/piece.cmo src/row.cmo src/col.cmo src/columns.cmo src/line.cmo src
 game.cmxa: src/piece.cmx src/row.cmx src/col.cmx src/columns.cmx src/line.cmx src/lines.cmx src/board.cmx src/player.cmx src/ai.cmx src/game.cmx
 	$(OCAMLOPT) -a -package batteries src/piece.cmx src/row.cmx src/col.cmx src/columns.cmx src/line.cmx src/lines.cmx src/board.cmx src/player.cmx src/ai.cmx src/game.cmx -o game.cmxa
 
-spec: game.cma spec/spec.ml
-	ospecl -I src spec/spec.ml
+spec: game.cma spec/*.ml
+	ospecl -I src spec/*.ml
 
 tui.byte: game.cma src/tui.ml
 	$(OCAMLC) -thread -linkpkg game.cma src/tui.ml -o tui.byte
