@@ -21,103 +21,102 @@ open Batteries_uni
 
 let specs = [
   describe "AI" [
-    describe ".minimax" begin
-      let equal_to_float = within 0.0001 in [
-        
-        it "returns 0 if Board.empty" begin
-          let module TestAI = Ai.Make(Board) in
+    describe ".choose_column" begin
+      let equal_to_col = equal_to Col.to_string in [
+      it "avoids columns which are full" begin
+        let module TestMinimax = Ai.Make(struct include Board
+          let drop _ col board =
+            if col != Col.Col3 then raise (Column_full col) else
+            board
+        end)
 
-          Board.empty |> TestAI.minimax 0 Piece.Yellow Piece.Yellow TestAI.winning_score =~ is equal_to_float 0.
-        end;
-        it "returns losing score if opponent has won" begin
-          let module TestAI = Ai.Make (struct include Board
-            let has_won player board =
-              player = Piece.Red
-          end) in
+        in
+        TestMinimax.choose_column 1 Board.empty Piece.Yellow =~ is equal_to_col Col.Col3
+      end;
+      describe "with depth of 1" begin
+        let depth = 1 in [
+        describe "where the mover can win with a single drop in some column" [
+          it "chooses that column" begin
+            let module TestMinimax = Ai.Make(struct include Board
+              let wins = ref false
+              let drop piece col board =
+                wins := (col = Col.Col4 && piece = Piece.Yellow);
+                board
 
-          TestAI.minimax 0 Piece.Yellow Piece.Yellow TestAI.winning_score Board.empty =~ is equal_to_float TestAI.losing_score
-        end;
-        it "with depth 0 returns value from eval function" begin
-          let module TestAI = Ai.Make (struct include Board
-            let evaluate _ _ = 5.
-          end) in
+              let has_won piece board = !wins
+            end)
+            in
 
-          TestAI.minimax 0 Piece.Yellow Piece.Yellow TestAI.winning_score Board.empty =~ is equal_to_float 5.
-        end;
-        it "with depth 1 returns winning score if player can win this turn" begin
-          let module TestAI = Ai.Make (struct include Board
-            let has_won player board =
-              player = Piece.Yellow
-          end) in
+            TestMinimax.choose_column depth Board.empty Piece.Yellow =~ is equal_to_col Col.Col4
+          end
+        ];
+        describe "where the mover cannot win with one drop" [
+          it "chooses the column with the highest evaluation" begin
+            let module TestMinimax = Ai.Make(struct include Board
+              let value = ref 0.
+              let drop piece col board =
+                value := 
+                  if col = Col.Col4 && piece = Piece.Yellow then 
+                    1. 
+                  else 
+                    0.;
+                board
+              let evaluate _ _ = !value
+            end)
+            in
 
-          TestAI.minimax 1 Piece.Yellow Piece.Yellow TestAI.winning_score Board.empty =~ is equal_to_float TestAI.winning_score
-        end;
-        it "with depth 1 returns highest values from eval function after this turn" begin
-          let module TestAI = Ai.Make (struct include Board
-            let last_drop = ref None 
-            let drop _ col board = 
-              last_drop := Some col;
-              board
-            let evaluate player board =
-              match !last_drop with
-              | Some Col.Col2 -> 5.
-              | _             -> 0.
-          end) in
-
-          TestAI.minimax 1 Piece.Yellow Piece.Yellow TestAI.winning_score Board.empty =~ is equal_to_float 5.
-        end;
-        it "with depth 2 returns highest of lowest eval values after 2 turns" begin
-          let module TestAI = Ai.Make (struct include Board
-            let yellow_col = ref None
-            let red_col = ref None
-
-            let drop piece col board = 
-              begin 
-                match piece with 
-                | Piece.Yellow -> yellow_col := Some (col |> Col.to_int |> succ)
-                | Piece.Red -> red_col := Some (col |> Col.to_int |> succ)
-              end;
-              board
-
-            let evaluate player board =
-              match (!yellow_col, !red_col) with
-              | (Some y, Some r) -> y + r |> ( * ) (-1) |> float_of_int
-              | _ -> failwith "should have dropped both a yellow and a red piece"
-          end) in
-
-          TestAI.minimax 2 Piece.Yellow Piece.Yellow TestAI.winning_score Board.empty =~ is equal_to_float (-8.)
-        end;
-        it "with depth 1 returns an full score value for a full column" begin
-          let module TestAI = Ai.Make (struct include Board
-            let drop _ col _ =
-              raise (Board.Column_full col)
-          end) in
-
-          TestAI.minimax 1 Piece.Yellow Piece.Yellow TestAI.column_full_score Board.empty =~ is equal_to_float TestAI.column_full_score
-        end;
+            TestMinimax.choose_column depth Board.empty Piece.Yellow =~ is equal_to_col Col.Col4
+          end
+        ]
       ] 
       end;
-      describe ".choose_column" [
-        it "returns the move with the highest score" begin
-          let equal_to_col = equal_to Col.to_string in
+      describe "with depth of 2" begin
+        let depth = 2 in [
+        describe "where the opponent can win on their next move if mover drops in some column" [
+          it "does not choose that column" begin
+            let yellow_and_red_in_all_columns_but_3 = 
+              Col.left_to_right
+              |> List.filter ((!=) Col.Col3)
+              |> List.map (fun col -> Board.empty |> Board.drop Piece.Yellow col |> Board.drop Piece.Red col)
+            in
 
-          let module Board = struct include Board
-            let last_drop = ref None
+            let module TestMinimax = Ai.Make(struct include Board
+              let has_won piece board =
+                piece = Piece.Red && List.mem board yellow_and_red_in_all_columns_but_3
+            end)
 
-            let drop _ col board =
-              last_drop := Some col;
-              board
+            in 
+            TestMinimax.choose_column depth Board.empty Piece.Yellow =~ is equal_to_col Col.Col3
+          end
+        ];
+        describe "where the opponent cannot win on their next move" [
+          it "chooses the column with the least low evaluation" begin
+            let module TestMinimax = Ai.Make (struct include Board
+              let yellow_col = ref None
+              let red_col = ref None
 
-            let evaluate _ board =
-              match !last_drop with
-              | Some Col.Col4 -> 1.
-              | _ -> 0.
-          end 
-          in
-          let module TestAI = Ai.Make (Board) in
+              let drop piece col board = 
+                begin 
+                  match piece with 
+                  | Piece.Yellow -> yellow_col := Some (col |> Col.to_int)
+                  | Piece.Red -> red_col := Some (col |> Col.to_int)
+                end;
+                board
 
-          TestAI.choose_column 0 Board.empty Piece.Yellow =~ is equal_to_col Col.Col4
-        end;
-      ];
-    ];
+              (* the further right they drop, the lower the score after 2 turns *)
+              let evaluate player board =
+                match (!yellow_col, !red_col) with
+                | (Some y, Some r) -> y + r |> ( * ) (-1) |> float_of_int
+                | _ -> failwith "should have dropped both a yellow and a red piece"
+            end) 
+            in
+
+            TestMinimax.choose_column depth Board.empty Piece.Yellow =~ is equal_to_col Col.Col1
+          end
+        ]
+      ]
+      end;
+    ] 
+    end;
+  ];
 ]
