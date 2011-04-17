@@ -1,7 +1,7 @@
 all: spec
 
 clean:
-	find -E . -regex '.*\.(cm..?|a|o|exe|byte|source_dependencies|toplevel)' | xargs rm
+	find -E . -regex '.*(\.cm..?|\.a|\.o|\.exe|\.byte|.source_dependencies|toplevel)$$' | xargs rm
 
 toplevel: game.cma
 	ocamlmktop -o toplevel unix.cma nums.cma bigarray.cma str.cma `ocamlfind query camomile`/camomile.cma `ocamlfind query batteries`/batteries_uni.cma game.cma

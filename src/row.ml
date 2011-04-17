@@ -22,5 +22,5 @@ let of_int = function
   | 5 -> Row6
   | i -> invalid_arg (Printf.sprintf "Row index of %d is invalid. Must be in range [0-5]." i)
 
-let to_string index = "Row" ^ (index |> to_int |> string_of_int)
+let to_string index = "Row" ^ (index |> to_int |> succ |> string_of_int)
 

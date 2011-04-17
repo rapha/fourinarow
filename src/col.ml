@@ -24,4 +24,4 @@ let of_int = function
   | 6 -> Col7
   | _ -> invalid_arg "col index must be in range [0-6]"
 
-let to_string index = "Col" ^ (index |> to_int |> (+) 1 |> string_of_int)
+let to_string index = "Col" ^ (index |> to_int |> succ |> string_of_int)
