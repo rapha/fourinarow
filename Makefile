@@ -13,7 +13,7 @@ game.cmxa: src/piece.cmx src/row.cmx src/col.cmx src/columns.cmx src/line.cmx sr
 	$(OCAMLOPT) -a -package batteries src/piece.cmx src/row.cmx src/col.cmx src/columns.cmx src/line.cmx src/lines.cmx src/board.cmx src/player.cmx src/ai.cmx src/game.cmx -o game.cmxa
 
 spec: game.cma spec/*.ml
-	ospecl -I src spec/*.ml
+	ospecl -I src -color spec/*.ml
 
 tui.byte: game.cma src/tui.ml
 	$(OCAMLC) -thread -linkpkg game.cma src/tui.ml -o tui.byte

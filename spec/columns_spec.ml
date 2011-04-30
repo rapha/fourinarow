@@ -1,5 +1,16 @@
+#use "topfind"
+
+#require "unix"
+#require "ospecl"
 open Ospecl.Spec
 open Ospecl.Matchers
+
+#require "batteries"
+open Batteries_uni
+
+#load "col.cmo"
+#load "row.cmo"
+#load "columns.cmo"
 
 let specs = [
   describe "Columns" [

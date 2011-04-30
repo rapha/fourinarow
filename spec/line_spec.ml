@@ -1,5 +1,14 @@
+#use "topfind"
+
+#require "unix"
+#require "ospecl"
 open Ospecl.Spec
 open Ospecl.Matchers
+
+#require "batteries"
+open Batteries_uni
+
+#load "line.cmo"
 
 let specs = [
   describe "Line" [
